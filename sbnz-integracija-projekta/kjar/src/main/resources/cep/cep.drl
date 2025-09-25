@@ -1,0 +1,74 @@
+package cep;
+
+global java.util.Set suspiciousIPs;
+global java.util.Set suspiciousPorts;
+import com.ftn.sbnz.model.events.PacketEvent;
+import com.ftn.sbnz.model.models.Alert;
+import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Device;
+import com.ftn.sbnz.model.models.Severity;
+
+rule "Suspicious destination IP or port"
+when
+    $p : PacketEvent(
+        (destinationIP memberOf suspiciousIPs)
+        || (destinationPort memberOf suspiciousPorts)
+    )
+    not (Alert(
+        code == "SUSPICIOUS_DESTINATION",
+        description == $p.destinationIP + ":" + $p.destinationPort
+    ))
+then
+    System.out.println("Inserting Alert for suspicious destination "
+        + $p.getDestinationIP() + ":" + $p.getDestinationPort());
+
+    // Create alert
+    Alert alert = new Alert(
+        "SUSPICIOUS_DESTINATION",
+        Severity.HIGH,
+        $p.getDestinationIP() + ":" + $p.getDestinationPort()
+    );
+    insert(alert);
+
+    // Optional recommendation
+    Recommendation rec = new Recommendation(
+        new Device($p.getDestinationIP(), ""), // assuming you have Device class
+        "Block traffic",
+        "Destination is known to be suspicious"
+    );
+    insert(rec);
+end
+
+
+rule "Many destinations from same source IP"
+    when
+        // Bind source IP
+        $p1 : PacketEvent($srcIP: sourceIP, $dstIP: destinationIP)
+        $countDest: Number(intValue >= 3) from accumulate(
+            $p2: PacketEvent(
+                this != $p1,
+                sourceIP == $srcIP,
+                destinationIP != $dstIP,
+                this after[0s, 1h] $p1
+            ),
+            count($p2)
+        )
+        // Avoid duplicate alerts for same source
+        not Alert( code == "MANY_DESTINATIONS", description.contains($srcIP))
+    then
+        System.out.println("Inserting Alert for source IP with many destinations: " + $srcIP);
+
+        Alert alert = new Alert(
+            "MANY_DESTINATIONS",
+            Severity.HIGH,
+            $srcIP
+        );
+        insert(alert);
+
+        Recommendation rec = new Recommendation(
+            new Device($srcIP, ""),
+            "Investigate source host",
+            "Source contacted " + $countDest.intValue() + " different destinations in the last 10 minutes"
+        );
+        insert(rec);
+end

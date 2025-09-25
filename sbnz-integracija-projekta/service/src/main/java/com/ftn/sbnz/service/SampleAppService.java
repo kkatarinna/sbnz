@@ -1,5 +1,6 @@
 package com.ftn.sbnz.service;
 
+import com.ftn.sbnz.model.events.PacketEvent;
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.NetworkService;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
@@ -16,13 +17,18 @@ public class SampleAppService {
 
 	private final KieSession fwSession;
     private final KieSession tempSession;
+    private final KieSession cepSession;
 
 	@Autowired
-	public SampleAppService(@Qualifier("fwKsession") KieSession fwSession, @Qualifier("tempKsession") KieSession tempSession) {
+	public SampleAppService(@Qualifier("fwKsession") KieSession fwSession,
+                            @Qualifier("tempKsession") KieSession tempSession,
+                            @Qualifier("cepKsession") KieSession cepSession) {
 		this.fwSession = fwSession;
         this.tempSession = tempSession;
+        this.cepSession = cepSession;
 
-		// Dodaj listener za sve sesije odmah pri kreiranju servisa
+
+        // Dodaj listener za sve sesije odmah pri kreiranju servisa
 		this.fwSession.addEventListener(new DefaultAgendaEventListener() {
 			@Override
 			public void afterMatchFired(AfterMatchFiredEvent event) {
@@ -33,6 +39,13 @@ public class SampleAppService {
             @Override
             public void afterMatchFired(AfterMatchFiredEvent event) {
                 System.out.println("Temp Pravilo aktivirano: " + event.getMatch().getRule().getName());
+            }
+        });
+
+        this.cepSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                System.out.println("cep Pravilo aktivirano: " + event.getMatch().getRule().getName());
             }
         });
 
@@ -101,18 +114,22 @@ public class SampleAppService {
 		return response;
 	}
 
-	/**
-	 * Samo insert bez praćenja (stari API)
-	 */
-	public String insertDevice(Device device) {
-		fwSession.insert(device);
-		fwSession.fireAllRules();
-		return "inserted device";
-	}
+    public Map<String, Object> insertPacketAndTrack(PacketEvent packet) {
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRulesCEP = new ArrayList<>();
 
-	public String insertService(NetworkService service) {
-		fwSession.insert(service);
-		fwSession.fireAllRules();
-		return "inserted service";
-	}
+        cepSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesCEP.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        cepSession.insert(packet);
+        int countCEP = cepSession.fireAllRules();
+        response.put("countCep: ", countCEP);
+        response.put("firedCEPRules", firedRulesCEP);
+        response.put("CEPsessionObjects", cepSession.getObjects());
+        return response;
+    }
 }

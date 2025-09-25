@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 @Configuration
 public class DroolsConfig {
@@ -32,7 +33,18 @@ public class DroolsConfig {
 
     @Bean
     public KieSession cepKsession() {
-        return kieContainer.newKieSession("cepKsession");
+
+
+        KieSession kieSession = kieContainer.newKieSession("cepKsession");
+
+        Set<String> suspiciousIPs = Set.of("192.168.1.100", "10.0.0.5");
+        Set<Integer> suspiciousPorts = Set.of(22, 23, 3389, 4444);
+
+
+        kieSession.setGlobal("suspiciousIPs", suspiciousIPs);
+        kieSession.setGlobal("suspiciousPorts", suspiciousPorts);
+
+        return kieSession;
     }
 
 

@@ -7,7 +7,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="networkService" />
         <module name="kjar" />
         <module name="model" />
         <module name="service" />
@@ -18,7 +17,6 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="kjar" options="-parameters" />
       <module name="model" options="-parameters" />
-      <module name="networkService" options="-parameters" />
       <module name="service" options="-parameters" />
     </option>
   </component>

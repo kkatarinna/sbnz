@@ -2,6 +2,7 @@ package com.ftn.sbnz.service;
 
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.NetworkService;
+import com.ftn.sbnz.model.events.PacketEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,17 @@ public class SampleAppController {
 
 		return result;
 	}
+
+    @RequestMapping(value = "/packet",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> insertPacket(@RequestBody PacketEvent packet) {
+
+        Map<String, Object> result = sampleService.insertPacketAndTrack(packet);
+
+        return result;
+    }
 	
 	
 	
