@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Device {
 
 

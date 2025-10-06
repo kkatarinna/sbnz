@@ -47,6 +47,15 @@ public class DroolsConfig {
         return kieSession;
     }
 
+    @Bean
+    public KieSession cepKsession2() {
+
+
+        KieSession kieSession = kieContainer.newKieSession("cepKsession2");
+
+        return kieSession;
+    }
+
 
     @Bean
     public KieSession tempKsession() {
@@ -58,7 +67,6 @@ public class DroolsConfig {
         ExternalSpreadsheetCompiler converter = new ExternalSpreadsheetCompiler();
         String drl = converter.compile(data, template, 3, 2);
 
-        System.out.println(drl);
 
         return this.createKieSessionFromDRL(drl);
 

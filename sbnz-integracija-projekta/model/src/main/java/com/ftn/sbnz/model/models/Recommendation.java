@@ -11,8 +11,6 @@ import java.util.UUID;
 public class Recommendation {
     private UUID id = UUID.randomUUID();
     @NonNull
-    private Device device;
-    @NonNull
     private String action;
     @NonNull
     private String rationale;

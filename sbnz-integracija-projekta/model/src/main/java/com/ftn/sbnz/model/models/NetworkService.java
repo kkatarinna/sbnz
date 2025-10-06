@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class NetworkService {
 
     private UUID id = UUID.randomUUID();
@@ -16,7 +16,7 @@ public class NetworkService {
     @NonNull
     private String name;
     @NonNull
-    private float version;
+    private String version;
     @NonNull
     private int port;
 }

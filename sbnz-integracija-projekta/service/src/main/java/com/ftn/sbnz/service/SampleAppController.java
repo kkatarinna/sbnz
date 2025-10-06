@@ -3,6 +3,9 @@ package com.ftn.sbnz.service;
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.NetworkService;
 import com.ftn.sbnz.model.events.PacketEvent;
+import com.ftn.sbnz.service.DTO.DeviceDTO;
+import com.ftn.sbnz.service.DTO.NetworkServiceDTO;
+import com.ftn.sbnz.service.DTO.PacketDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +29,7 @@ public class SampleAppController {
 			method = RequestMethod.POST,
 			consumes = "application/json",
 			produces = "application/json")
-	public Map<String, Object> insertDevice(@RequestBody Device device) {
+	public Map<String, Object> insertDevice(@RequestBody DeviceDTO device) {
 
 		Map<String, Object> result = sampleService.insertDeviceAndTrack(device);
 
@@ -37,7 +40,7 @@ public class SampleAppController {
 			method = RequestMethod.POST,
 			consumes = "application/json",
 			produces = "application/json")
-	public Map<String, Object> insertService(@RequestBody NetworkService networkService) {
+	public Map<String, Object> insertService(@RequestBody NetworkServiceDTO networkService) {
 
 		Map<String, Object> result = sampleService.insertServiceAndTrack(networkService);
 
@@ -48,7 +51,7 @@ public class SampleAppController {
             method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
-    public Map<String, Object> insertPacket(@RequestBody PacketEvent packet) {
+    public Map<String, Object> insertPacket(@RequestBody PacketDTO packet) {
 
         Map<String, Object> result = sampleService.insertPacketAndTrack(packet);
 

@@ -4,7 +4,7 @@ import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.Vulnerability;
 import com.ftn.sbnz.model.models.Recommendation;
 import com.ftn.sbnz.model.models.Severity;
-import com.ftn.sbnz.model.models.Alert;
+import com.ftn.sbnz.model.events.Alert;
 
 rule "F1: Telnet insecure"
 when
@@ -17,7 +17,7 @@ rule "F2: Recommend close port"
 when
     $v : Vulnerability( code == "TELNET_INSECURE", $dev : device )
 then
-    insert( new Recommendation($dev, "Close port 23 / remove telnet", "Insecure networkService"));
+    insert( new Recommendation("Close port 23 / remove telnet on device: " + $dev, "Insecure networkService"));
 end
 
 rule "F3: Raise network alarm when many telnet vulns"

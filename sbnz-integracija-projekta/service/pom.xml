@@ -95,7 +95,17 @@
 			<artifactId>drools-templates</artifactId>
 			<version>${drools.version}</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.34</version>
+		</dependency>
+    </dependencies>
 
 	<build>
 		<plugins>

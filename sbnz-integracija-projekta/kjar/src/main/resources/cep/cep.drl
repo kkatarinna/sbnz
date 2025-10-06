@@ -3,10 +3,33 @@ package cep;
 global java.util.Set suspiciousIPs;
 global java.util.Set suspiciousPorts;
 import com.ftn.sbnz.model.events.PacketEvent;
-import com.ftn.sbnz.model.models.Alert;
+import com.ftn.sbnz.model.enums.Flag;
+import com.ftn.sbnz.model.events.Alert;
 import com.ftn.sbnz.model.models.Recommendation;
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.Severity;
+import java.util.Date;
+
+declare SynAttempt
+    @Role( Role.Type.EVENT )
+    @Timestamp( timestamp )
+    srcIP : String
+    dstIP : String
+    srcPort : int
+    dstPort : int
+    timestamp : Date
+end
+
+declare AckSeen
+    @Role( Role.Type.EVENT )
+    @Timestamp( timestamp )
+    srcIP : String
+    dstIP : String
+    srcPort : int
+    dstPort : int
+    timestamp : Date
+end
+
 
 rule "Suspicious destination IP or port"
 when
@@ -32,9 +55,8 @@ then
 
     // Optional recommendation
     Recommendation rec = new Recommendation(
-        new Device($p.getDestinationIP(), ""), // assuming you have Device class
         "Block traffic",
-        "Destination is known to be suspicious"
+        "Destination IP is in suspicious list"
     );
     insert(rec);
 end
@@ -61,14 +83,108 @@ rule "Many destinations from same source IP"
         Alert alert = new Alert(
             "MANY_DESTINATIONS",
             Severity.HIGH,
-            $srcIP
+            "Packets coming from: " + $srcIP
         );
         insert(alert);
 
         Recommendation rec = new Recommendation(
-            new Device($srcIP, ""),
             "Investigate source host",
             "Source contacted " + $countDest.intValue() + " different destinations in the last 10 minutes"
         );
         insert(rec);
+end
+
+
+rule "SingleSource SYN Flood"
+    when
+        $s : PacketEvent( flags contains Flag.SYN, $srcIP : sourceIP, $dstIP : destinationIP ) over window:time(10s)
+        // prebroji koliko SYN-ova iz istog srcIP prema istom dstIP u poslednjih 10s
+        // koristimo accumulate za count sa filtriranjem po src/dst
+        accumulate(
+            $p : PacketEvent(flags contains Flag.SYN, sourceIP == $srcIP, destinationIP == $dstIP) over window:time(10s),
+            $count : count($p)
+        )
+        eval( $count >= 3 )
+        not Alert( code == "SYN_FLOODING", description.contains($srcIP))
+    then
+        Alert alert = new Alert(
+            "SYN_FLOODING",
+            Severity.HIGH,
+            "POSSIBLE SINGLE-SOURCE SYN FLOOD: src=" + $srcIP + " dst=" + $dstIP + " syn_count=" + $count
+        );
+        insert(alert);
+end
+
+rule "Distributed SYN Flood"
+    when
+        $t : PacketEvent(flags contains Flag.SYN, $dstIP: destinationIP ) over window:time(10s)
+        // skupljamo set jedinstvenih srcIP koji šalju SYN na $dstIP
+        accumulate(
+            $p : PacketEvent(flags contains Flag.SYN, destinationIP == $dstIP ) over window:time(10s),
+            $srcSet : collectSet($p.getSourceIP())
+        )
+        eval( $srcSet.size() >= 3 )
+
+        not Alert( code.equals("DISTRIBUTED_FLOODING"), description.contains($t.getDestinationIP()))
+
+    then
+        Alert alert = new Alert(
+            "DISTRIBUTED_SYN_FLOODING",
+            Severity.HIGH,
+            "POSSIBLE Distributed-SOURCE SYN FLOOD: src=" + $srcSet + " dst=" + $dstIP + " syn_count=" + $srcSet.size()
+        );
+        insert(alert);
+end
+
+rule "Create Syn"
+    when
+        $p : PacketEvent(flags contains Flag.SYN )
+    then
+        insert( new SynAttempt($p.getSourceIP(), $p.getDestinationIP(), $p.getSourcePort(), $p.getDestinationPort(), $p.getExecutionTime()) );
+end
+
+rule "Create AckSeen"
+    when
+        $p : PacketEvent( flags contains Flag.SYN && flags contains Flag.ACK)
+    then
+        insert( new AckSeen($p.getSourceIP(), $p.getDestinationIP(), $p.getSourcePort(), $p.getDestinationPort(), $p.getExecutionTime()) );
+end
+
+
+rule "Half-open connection (no ACK within 5s)"
+    timer( int: 5s)
+    when
+        $syn : SynAttempt( $srcIP: srcIP, $dstIP: dstIP, $srcPort: srcPort, $dstPort: dstPort, $synTs: timestamp ) over window:time(30s)  // event lifetime
+        // ne postoji odgovarajući AckSeen koji bi završio handshake (gledaš za ack sa obrnutim adresama ili odgovarajućim portovima)
+        not AckSeen(srcIP == $dstIP,
+                    dstIP == $srcIP,
+                    srcPort == $dstPort,
+                    dstPort == $srcPort)
+    then
+        Alert alert = new Alert(
+          "Half-Open_connections",
+          Severity.MID,
+          "Half-Open Connections: srcIP = " + $srcIP + " dst = " + $dstIP + " srcPORT = " + $srcPort + " dstPORT= " + $dstPort
+        );
+        insert(alert);
+end
+
+rule "Many Half-Open on DST"
+    when
+        $s : SynAttempt()
+        accumulate(
+            $h : Alert(code.equals("Half-Open_connections"), description.contains($s.getDstIP())) over window:time(30s),
+            $count : count($h)
+        )
+        eval( $count >= 3 )
+
+        not Alert( code.equals("Many_Half-Open_connections"), description.contains($s.getSrcIP()))
+    then
+
+        Alert alert = new Alert(
+          "Many_Half-Open_connections",
+          Severity.MID,
+          "Many Half-Open Connections: srcIP=" + $s.getSrcIP() + " dst=" + $s.getDstIP() + "srcPORT=" + $s.getSrcPort() + " dstPORT=" + $s.getDstPort()
+        );
+        insert(alert);
 end

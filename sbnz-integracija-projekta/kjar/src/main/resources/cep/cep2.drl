@@ -1,0 +1,66 @@
+package cep2;
+
+import com.ftn.sbnz.model.events.PacketEvent;
+import com.ftn.sbnz.model.enums.Flag;
+import com.ftn.sbnz.model.enums.Protocol;
+import com.ftn.sbnz.model.events.Alert;
+import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Device;
+import com.ftn.sbnz.model.models.Severity;
+import java.util.Date;
+
+// 1) DNS tunneling — long subdomain queries
+rule "DNS Tunneling"
+when
+    $src : PacketEvent( $sourceIP : sourceIP )
+    $count : Number( intValue > 3 ) from accumulate(
+        $d : PacketEvent(sourceIP.equals($sourceIP), protocol == Protocol.DNS, dnsQuery != null, eval(dnsQuery.length() > 50) ) over window:time(60s),
+        count($d)
+    )
+    not Alert( code == "Possible_DNS_Tunneling", description.contains($sourceIP))
+then
+        Alert alert = new Alert(
+          "Possible_DNS_Tunneling",
+          Severity.MID,
+          "Possible DNS tunneling from host " + $sourceIP + " with "+ $count +" long queries in 60s"
+        );
+        insert(alert);
+end
+
+// 2) ICMP tunneling — large payloads
+rule "ICMP Tunneling"
+when
+    $src : PacketEvent( $sourceIP : sourceIP )
+    $count : Number( intValue > 5 ) from accumulate(
+        $i : PacketEvent(sourceIP.equals($sourceIP), protocol == Protocol.ICMP, eval(payloadSize > 200) ) over window:time(60s),
+        count($i)
+    )
+    not Alert( code == "Possible_ICMP_Tunneling", description.contains($sourceIP))
+then
+        Alert alert = new Alert(
+          "Possible_ICMP_Tunneling",
+          Severity.MID,
+          "Possible ICMP tunneling from host " + $sourceIP + " with "+ $count +" long queries in 60s"
+        );
+        insert(alert);
+end
+
+
+// 6) Outbound Port Abuse — unusual payload size on DNS port
+rule "Outbound Port Abuse"
+when
+    $src : PacketEvent( $sourceIP : sourceIP )
+    $count : Number( intValue > 2 ) from accumulate(
+        $p : PacketEvent(sourceIP.equals($sourceIP), protocol == Protocol.DNS, eval(payloadSize > 1024) ) over window:time(60s),
+        count($p)
+    )
+    not Alert( code == "Outbound_port_abuse", description.contains($sourceIP))
+then
+
+        Alert alert = new Alert(
+          "Outbound_port_abuse",
+          Severity.MID,
+          "Outbound port abuse (DNS over-sized packets) from host " + $sourceIP + " with " + $count + " events in 60s"
+        );
+        insert(alert);
+end
