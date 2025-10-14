@@ -23,6 +23,7 @@ public class SampleAppService {
 
 	private final KieSession fwSession;
     private final KieSession tempSession;
+    private final KieSession tempSession2;
     private final KieSession cepSession;
     private final KieSession cepSession2;
 
@@ -35,6 +36,7 @@ public class SampleAppService {
 	@Autowired
 	public SampleAppService(@Qualifier("fwKsession") KieSession fwSession,
                             @Qualifier("tempKsession") KieSession tempSession,
+                            @Qualifier("tempKsession2") KieSession tempSession2,
                             @Qualifier("cepKsession") KieSession cepSession,
                             @Qualifier("cepKsession2") KieSession cepSession2,
                             DeviceMapper deviceMapper,
@@ -42,6 +44,7 @@ public class SampleAppService {
                             PacketMapper packetMapper) {
 		this.fwSession = fwSession;
         this.tempSession = tempSession;
+        this.tempSession2 = tempSession2;
         this.cepSession = cepSession;
         this.cepSession2 = cepSession2;
         this.deviceMapper = deviceMapper;
@@ -63,7 +66,21 @@ public class SampleAppService {
             }
         });
 
+        this.tempSession2.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                System.out.println("Temp Pravilo aktivirano: " + event.getMatch().getRule().getName());
+            }
+        });
+
         this.cepSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                System.out.println("cep Pravilo aktivirano: " + event.getMatch().getRule().getName());
+            }
+        });
+
+        this.cepSession2.addEventListener(new DefaultAgendaEventListener() {
             @Override
             public void afterMatchFired(AfterMatchFiredEvent event) {
                 System.out.println("cep Pravilo aktivirano: " + event.getMatch().getRule().getName());
@@ -79,23 +96,22 @@ public class SampleAppService {
 		Map<String, Object> response = new HashMap<>();
 		List<String> firedRules = new ArrayList<>();
 
-		// Lokalni listener za ovu operaciju
-		fwSession.addEventListener(new DefaultAgendaEventListener() {
-			@Override
-			public void afterMatchFired(AfterMatchFiredEvent event) {
-				firedRules.add(event.getMatch().getRule().getName());
-			}
-		});
+        tempSession2.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRules.add(event.getMatch().getRule().getName());
+            }
+        });
 
         Device device = deviceMapper.toEntity(deviceDTO);
 
-		fwSession.insert(device);
-		int count = fwSession.fireAllRules();
-
-		response.put("count: ",count);
-		response.put("firedRules", firedRules);
-		response.put("sessionObjects", fwSession.getObjects());
-
+        tempSession.insert(device);
+        int countTemp = tempSession.fireAllRules();
+        if(countTemp != 0) {
+            response.put("countTemp: ", countTemp);
+            response.put("firedTempRules", firedRules);
+            response.put("TempsessionObjects", tempSession.getObjects());
+        }
 		return response;
 	}
 

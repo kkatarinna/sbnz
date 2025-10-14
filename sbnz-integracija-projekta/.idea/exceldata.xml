@@ -2,7 +2,9 @@
 <project version="4">
   <component name="excel">
     <excel>
+      <entry path="$PROJECT_DIR$/kjar/src/main/resources/temlatetable2/os_vulnerabilities.xls" uuid="09b56ed4-ac96-3a06-b5c7-95f958e3d36f" />
       <entry path="$PROJECT_DIR$/kjar/src/main/resources/templatetable/template-data.xls" uuid="6d30af12-ee2f-3828-aacd-d565897181c4" />
+      <entry path="$PROJECT_DIR$/kjar/src/main/resources/templatetable2/os_vulnerabilities.xls" uuid="12cf244d-0219-3981-a0a6-b168490ffa53" />
     </excel>
   </component>
 </project>

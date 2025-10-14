@@ -27,11 +27,6 @@ public class DroolsConfig {
     }
 
     @Bean
-    public KieSession bwKsession() {
-        return kieContainer.newKieSession("bwKsession");
-    }
-
-    @Bean
     public KieSession cepKsession() {
 
 
@@ -64,11 +59,33 @@ public class DroolsConfig {
         InputStream template = DroolsConfig.class.getResourceAsStream("/templatetable/template.drt");
         InputStream data = DroolsConfig.class.getResourceAsStream("/templatetable/template-data.xls");
 
+        if(template == null || data == null) {
+            throw new RuntimeException("Ne mogu da nađem template ili data fajl za tempKsession2");
+        }
         ExternalSpreadsheetCompiler converter = new ExternalSpreadsheetCompiler();
         String drl = converter.compile(data, template, 3, 2);
 
 
         return this.createKieSessionFromDRL(drl);
+
+    }
+
+    @Bean
+    public KieSession tempKsession2() {
+        InputStream template;
+        InputStream data;
+        try{
+            template = DroolsConfig.class.getResourceAsStream("/templatetable2/template2.drt");
+            data = DroolsConfig.class.getResourceAsStream("/templatetable2/os_vulnerabilities.xls");
+            ExternalSpreadsheetCompiler converter = new ExternalSpreadsheetCompiler();
+            String drl = converter.compile(data, template, 3, 2);
+
+
+            return this.createKieSessionFromDRL(drl);
+        }catch(Exception e){
+            System.out.println("UNABLE TO FIND: " + e.getMessage());
+        }
+        return null;
 
     }
 

@@ -21,14 +21,11 @@ public class Device {
     private String osVersion;
 
     @NonNull
-    private String osArch;
-
-    @NonNull
     private String osType; // npr. "Windows", "Linux", "MacOS"
 
     @Override
     public String toString() {
         return String.format("Device{id=%s, ip=%s, osName=%s, osVersion=%s, osArch=%s, osType=%s}",
-                id, ip, osName, osVersion, osArch, osType);
+                id, ip, osName, osVersion, osType);
     }
 }

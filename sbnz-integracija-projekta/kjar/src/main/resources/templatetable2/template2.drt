@@ -1,13 +1,12 @@
 template header
-osName
 os
-minVersion
-code
+newestVersion
 severity
 recommendation
 message
+type
 
-package templatetable;
+package templatetable2;
 
 import com.ftn.sbnz.model.models.NetworkService;
 import com.ftn.sbnz.model.models.Device;
@@ -18,12 +17,10 @@ import com.ftn.sbnz.model.events.Alert;
 
 template "os_classification_template"
 
-rule "T_@{code}_@{os}"
+rule "T_@{os}_outdated"
 when
-    $s : NetworkService( port == @{os}, name == "@{osName}", version ==
-    "@{minVersion}",  $dev : device )
+    $s : Device( osName == "@{os}", osType == "@{type}", osVersion < "@{newestVersion}")
 then
-    insert( new Vulnerability($dev, "@{code}", Severity.@{severity}, "@{message}") );
     insert( new Recommendation("@{recommendation}", "Triggered by template")
     );
 end
