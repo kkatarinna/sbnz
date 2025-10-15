@@ -12,6 +12,7 @@ import com.ftn.sbnz.service.Mapper.PacketMapper;
 import com.ftn.sbnz.service.cep2Attacks.DnsTunneling;
 import com.ftn.sbnz.service.cep2Attacks.IcmpTunneling;
 import com.ftn.sbnz.service.cep2Attacks.OutBoundPortAbuse;
+import com.ftn.sbnz.service.sessionUtils.SessionUtils;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.kie.api.runtime.KieSession;
@@ -389,7 +390,10 @@ public class SampleAppService {
         if(countcep != 0) {
             response.put("countCep: ", countcep);
             response.put("firedCepRules", fiderRulesCep);
-            response.put("cepSessionObjects", this.cepSession2.getObjects());
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession2));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession2));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession2));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession2));
         }
         return response;
     }
