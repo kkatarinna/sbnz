@@ -104,14 +104,16 @@ public class SampleAppService {
         });
 
         for (Device d : device) {
-            tempSession.insert(d);
+            tempSession2.insert(d);
         }
-        int countTemp = tempSession.fireAllRules();
+        int countTemp = tempSession2.fireAllRules();
+
         if(countTemp != 0) {
-            response.put("countTemp: ", countTemp);
+            response.put("countTemp", countTemp);
             response.put("firedTempRules", firedRules);
-            response.put("TempsessionObjects", tempSession.getObjects());
+            response.put("TempsessionObjects", tempSession2.getObjects());
         }
+        System.out.println("COUNT TEMP"+response.get("countTemp"));
 		return response;
 	}
 

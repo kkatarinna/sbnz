@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Drools Frontend</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 <body>
     <h1>Drools Frontend</h1>
@@ -12,21 +14,31 @@
 
     {% if result %}
     <div class="result-box">
-        <pre>{{ result | tojson(indent=2) }}</pre>
-        <pre>{{ result.device | tojson(indent=2)}}</pre>
         <div class="message">{{ result.message }}</div>
-        {% if result.device %}
+        <!-- Broj aktiviranih pravila -->
+        {% if result.countTemp %}
+            <p><strong>Activated rules:</strong> {{ result.countTemp }}</p>
+        {% endif %}
+
+        <!-- Lista fired pravila -->
+        {% if result.firedTempRules %}
+            <p><strong>Rules:</strong></p>
+            <ul>
+                {% for rule in result.firedTempRules %}
+                    <li>{{ rule }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if result.devices %}
         <table>
             <tr>
-                <th>ID</th>
                 <th>IP adresa</th>
                 <th>OS Name</th>
                 <th>OS Type</th>
                 <th>OS Version</th>
             </tr>
-            {% for dev in result.device  %}
+            {% for dev in result.devices  %}
             <tr>
-                <td>{{ dev.id }}</td>
                 <td>{{ dev.ip }}</td>
                 <td>{{ dev.osName }}</td>
                 <td>{{ dev.osType }}</td>
