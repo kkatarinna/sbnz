@@ -65,69 +65,49 @@
                 {% endfor %}
             </ul>
         {% endif %}
-        
-        <!-- Tabela uređaja -->
-        <!-- {% if result.devices %}
+
+        {% if packets_table %}
+            <h3>Packets</h3>
             {{ macros.render_table(
-                ['IP adresa', 'OS Name', 'OS Type', 'OS Version'],
-                devices
+                ['ID', 'Source IP', 'Dest IP', 'Source Port', 'Dest Port', 'Protocol', 'Flags', 'Payload Size', 'DNS Query', 'Execution Time'],
+                packets_table
             ) }}
         {% endif %}
-        {% endif %} -->
-    
 
+        {% if device_table %}
+            <h3>Devices</h3>
+            {{ macros.render_table(
+                ['IP adresa', 'OS Name', 'OS Type', 'OS Version'],
+                device_table
+            ) }}
+        {% endif %}
 
-    <!-- {% if tempsession_table %}
-        <h3>Rezultat skeniranja mrežnih servisa</h3>
-        {{ macros.render_table(
-            ['ID', 'Device IP', 'Naziv / CVE kod', 'Verzija / Severity', 'Port', 'Opis / Rationale'],
-            tempsession_table
-        ) }}
-    {% endif %} -->
+        {% if alerts_table %}
+            <h3>Alerts</h3>
+            {{ macros.render_table(
+                ['ID', 'Code', 'Severity', 'Description', 'Execution Time'],
+                alerts_table
+            ) }}
+        {% endif %}
 
+        {% if vulnerabilities_table %}
+            <h3>Vulnerabilities</h3>
+            {{ macros.render_table(
+                ['ID', 'Code', 'Severity', 'Description'],
+                vulnerabilities_table
+            ) }}
+        {% endif %}
 
-
-    {% if packets_table %}
-        <h3>Packets</h3>
-        {{ macros.render_table(
-            ['ID', 'Source IP', 'Dest IP', 'Source Port', 'Dest Port', 'Protocol', 'Flags', 'Payload Size', 'DNS Query', 'Execution Time'],
-            packets_table
-        ) }}
-    {% endif %}
-
-    {% if device_table %}
-        <h3>Devices</h3>
-        {{ macros.render_table(
-            ['IP adresa', 'OS Name', 'OS Type', 'OS Version'],
-            device_table
-        ) }}
-    {% endif %}
-
-    {% if alerts_table %}
-        <h3>Alerts</h3>
-        {{ macros.render_table(
-            ['ID', 'Code', 'Severity', 'Description', 'Execution Time'],
-            alerts_table
-        ) }}
-    {% endif %}
-
-    {% if vulnerabilities_table %}
-        <h3>Vulnerabilities</h3>
-        {{ macros.render_table(
-            ['ID', 'Code', 'Severity', 'Description'],
-            vulnerabilities_table
-        ) }}
-    {% endif %}
-
-    {% if recommendations_table %}
-        <h3>Recommendations</h3>
-        {{ macros.render_table(
-            ['ID', 'Action', 'Rational'],
-            recommendations_table
-        ) }}
-    {% endif %}
+        {% if recommendations_table %}
+            <h3>Recommendations</h3>
+            {{ macros.render_table(
+                ['ID', 'Action', 'Rational'],
+                recommendations_table
+            ) }}
+        {% endif %}
+        
 
     </div>
-
+    {% endif %}
 </body>
 </html>

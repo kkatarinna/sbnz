@@ -6,6 +6,7 @@ import com.ftn.sbnz.model.models.Recommendation;
 import com.ftn.sbnz.model.models.Severity;
 import com.ftn.sbnz.model.events.Alert;
 
+//Telnet servis
 rule "F1: Telnet insecure"
 when
     $s : NetworkService( name == "telnet" || port == 23, $dev : device )
@@ -28,4 +29,29 @@ when
     )
 then
     insert( new Alert("ALARM_TELNET_WIDESPREAD", Severity.HIGH, "3+ devices with Telnet") );
+end
+
+//B: Izracun rizika
+rule "F4: HTTP without TLS"
+when
+    $s : NetworkService( name == "http", port == 80, $dev : device )
+then
+    insert( new Vulnerability($dev, "TELNET_INSECURE", Severity.MID, "Telnet is insecure; disable.") );
+end
+
+rule "F5: Outdated SSH"
+when
+    $s : NetworkService( name == "ssh", version == "2.4.56", $dev : device )
+then
+    insert( new Vulnerability($dev, "SSH_OLD", Severity.HIGH, "Upgrade OpenSSH >= 8.9") );
+end
+
+rule "F6: Risk score and isolate"
+when
+    $d : Device( $id : id )
+    $score : Number( intValue >= 1 ) from accumulate(Vulnerability( device == $d, $sev : severity ),
+    sum( $sev == Severity.HIGH ? 3 : 2 ))
+then
+    insert( new Recommendation("Isolate device from external network" + $d, "Risk score >= 5"));
+
 end

@@ -65,7 +65,21 @@ public class InsertServices {
         ssh.setPort(22);
         ssh.setVersion("2.9.1");
 
-        return new ArrayList<>(Arrays.asList(apache, ssh));
+        NetworkService http = new NetworkService();
+        http.setId(UUID.randomUUID());
+        http.setDevice(devices.get(0));
+        http.setName("http");
+        http.setPort(80);
+        http.setVersion("1.3.42");
+
+        NetworkService ssh2 = new NetworkService();
+        ssh2.setId(UUID.randomUUID());
+        ssh2.setDevice(devices.get(0));
+        ssh2.setName("ssh");
+        ssh2.setPort(22);
+        ssh2.setVersion("2.4.56");
+
+        return new ArrayList<>(Arrays.asList(apache, ssh, http, ssh2));
     }
 
     public static List<Device> GenerateDevices() {
