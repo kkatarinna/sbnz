@@ -6,6 +6,7 @@ import com.ftn.sbnz.model.models.NetworkService;
 import com.ftn.sbnz.service.DTO.DeviceDTO;
 import com.ftn.sbnz.service.DTO.NetworkServiceDTO;
 import com.ftn.sbnz.service.DTO.PacketDTO;
+import com.ftn.sbnz.service.Inserts.InsertServices;
 import com.ftn.sbnz.service.Mapper.DeviceMapper;
 import com.ftn.sbnz.service.Mapper.NetworkServiceMapper;
 import com.ftn.sbnz.service.Mapper.PacketMapper;
@@ -155,6 +156,8 @@ public class SampleAppService {
 		return response;
 	}
 
+
+
     public Map<String, Object> insertPacketAndTrack(PacketDTO packetDTO) {
         Map<String, Object> response = new HashMap<>();
         List<String> firedRulesCEP = new ArrayList<>();
@@ -185,5 +188,9 @@ public class SampleAppService {
         response.put("CEPsessionObjects", cepSession.getObjects());
         response.put("CEPsession2Objects", cepSession2.getObjects());
         return response;
+    }
+
+    public  Map<String, Object> insertServicesAndTrack(){
+        return InsertServices.insertServicesAndTrack(this.tempSession2, this.fwSession);
     }
 }
