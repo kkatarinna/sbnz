@@ -1,8 +1,11 @@
 package com.ftn.sbnz.service;
 
+import com.ftn.sbnz.model.events.Alert;
 import com.ftn.sbnz.model.events.PacketEvent;
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.NetworkService;
+import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Vulnerability;
 import com.ftn.sbnz.service.DTO.NetworkServiceDTO;
 import com.ftn.sbnz.service.DTO.PacketDTO;
 import com.ftn.sbnz.service.cep1Attacks.*;
@@ -195,17 +198,35 @@ public class SampleAppService {
         response.put("CEPsession2Objects", cepSession2.getObjects());
 
         if(countCEP + countCEP2 != 0){
+            List<String> allFiredRules = new ArrayList<>(firedRulesCEP);
+            allFiredRules.addAll(firedRulesCEP2);
+
+            List<PacketEvent> allPackets = new ArrayList<>(SessionUtils.getPacketEvents(cepSession));
+            allPackets.addAll(SessionUtils.getPacketEvents(cepSession2));
+
+            List<Alert> allAlerts = new ArrayList<>(SessionUtils.getAlerts(cepSession));
+            allAlerts.addAll(SessionUtils.getAlerts(cepSession2));
+
+            List<Alert> allVulns = new ArrayList<>(SessionUtils.getAlerts(cepSession));
+            allAlerts.addAll(SessionUtils.getAlerts(cepSession2));
+
+
+            List<Alert> allReccom = new ArrayList<>(SessionUtils.getAlerts(cepSession));
+            allAlerts.addAll(SessionUtils.getAlerts(cepSession2));
+
+
             response.put("count: ", countCEP + countCEP2);
-            response.put("firedRules", firedRulesCEP.addAll(firedRulesCEP2));
-            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession).addAll(SessionUtils.getPacketEvents(this.cepSession2)));
-            response.put("Alerts", SessionUtils.getAlerts(this.cepSession).addAll(SessionUtils.getAlerts(this.cepSession2)));
-            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession).addAll(SessionUtils.getVulnerability(this.cepSession2)));
-            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession).addAll(SessionUtils.getRecommendations(this.cepSession2)));
+            response.put("firedRules", allFiredRules);
+            response.put("Packets", allPackets);
+            response.put("Alerts", allAlerts);
+            response.put("Vulnerabilities", allVulns);
+            response.put("Recommendations", allReccom);
         }
         return response;
     }
 
     public Map<String, Object> scanDevice() {
+        this.tempSession2.getFactHandles().forEach(this.tempSession2::delete);
         List<Device> devices = InsertDevices.generateDevices();
         Map<String, Object> response = new HashMap<>();
         List<String> firedRulesTemp = new ArrayList<>();
@@ -234,6 +255,8 @@ public class SampleAppService {
     }
 
     public  Map<String, Object> scanServices(){
+        this.fwSession.getFactHandles().forEach(this.fwSession::delete);
+        this.tempSession.getFactHandles().forEach(this.tempSession::delete);
         List<NetworkService> services = InsertServices.generateNetworkServices();
         Map<String, Object> response = new HashMap<>();
         List<String> firedRulesFW = new ArrayList<>();
@@ -261,12 +284,28 @@ public class SampleAppService {
         int countTemp = tempSession.fireAllRules();
 
         if(countFW + countTemp != 0){
+
+            List<String> allFiredRules = new ArrayList<>(firedRulesTemp);
+            allFiredRules.addAll(firedRulesFW);
+
+            List<NetworkService> allNetworkServices = new ArrayList<>(SessionUtils.getNetworkServices(tempSession));
+
+            List<Alert> allAlerts = new ArrayList<>(SessionUtils.getAlerts(tempSession));
+            allAlerts.addAll(SessionUtils.getAlerts(fwSession));
+
+            List<Vulnerability> allVulns = new ArrayList<>(SessionUtils.getVulnerability(tempSession));
+            allVulns.addAll(SessionUtils.getVulnerability(fwSession));
+
+
+            List<Recommendation> allReccom = new ArrayList<>(SessionUtils.getRecommendations(tempSession));
+            allReccom.addAll(SessionUtils.getRecommendations(fwSession));
+
             response.put("count: ", countFW + countTemp);
-            response.put("firedRules", firedRulesFW.addAll(firedRulesTemp));
-            response.put("Packets", SessionUtils.getPacketEvents(this.tempSession).addAll(SessionUtils.getPacketEvents(this.fwSession)));
-            response.put("Alerts", SessionUtils.getAlerts(this.tempSession).addAll(SessionUtils.getAlerts(this.fwSession)));
-            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.tempSession).addAll(SessionUtils.getVulnerability(this.fwSession)));
-            response.put("Recommendations", SessionUtils.getRecommendations(this.tempSession).addAll(SessionUtils.getRecommendations(this.fwSession)));
+            response.put("firedRules", allFiredRules);
+            response.put("NetworkServices", allNetworkServices);
+            response.put("Alerts", allAlerts);
+            response.put("Vulnerabilities", allVulns);
+            response.put("Recommendations", allReccom);
         }
         return response;
     }
