@@ -48,6 +48,8 @@ public class InsertServices {
             response.put("firedTempRules", firedRulesTemp);
             response.put("TempsessionObjects", tempSession.getObjects());
         }
+        fwSession.getFactHandles().forEach(fwSession::delete);
+        tempSession.getFactHandles().forEach(tempSession::delete);
         return response;
     }
 
