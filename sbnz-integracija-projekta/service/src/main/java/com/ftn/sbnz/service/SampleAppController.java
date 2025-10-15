@@ -56,7 +56,7 @@ public class SampleAppController {
 		return result;
 	}
 
-    @RequestMapping(value = "/scanNestowrkService",
+    @RequestMapping(value = "/scanNestworkService",
             method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
