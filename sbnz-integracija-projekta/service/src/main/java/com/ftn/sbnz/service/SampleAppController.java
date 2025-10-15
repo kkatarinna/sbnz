@@ -66,14 +66,6 @@ public class SampleAppController {
 		return result;
 	}
 
-    @RequestMapping(value = "/scanNetworkService",
-            method = RequestMethod.POST,
-            consumes = "application/json",
-            produces = "application/json")
-    public Map<String, Object> scanNetworkService() {
-
-        return sampleService.insertServicesAndTrack();
-    }
 
     @RequestMapping(value = "/packet",
             method = RequestMethod.POST,
@@ -85,7 +77,75 @@ public class SampleAppController {
 
         return result;
     }
-	
-	
-	
+
+    @RequestMapping(value = "/scanNetworkService",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> scanNetworkService() {
+
+        return sampleService.insertServicesAndTrack();
+    }
+    @RequestMapping(value = "/suspiciousPacket",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> insertSuspiciousPacket() {
+
+        return sampleService.insertSuspiciousPacket();
+    }
+
+    @RequestMapping(value = "/networkScanAttack",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> networkScanAttack() {
+
+        return sampleService.networkScanAttack();
+    }
+
+    @RequestMapping(value = "/synFlood",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> synFlood() {
+
+        return sampleService.synFlood();
+    }
+
+    @RequestMapping(value = "/distributedSynFlood",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> distributedSynFlood() {
+
+        return sampleService.distributedSynFlood();
+    }
+
+    @RequestMapping(value = "/dnsTunneling",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> dnsTunneling() {
+
+        return sampleService.dnsTunneling();
+    }
+
+    @RequestMapping(value = "/icmpTunneling",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> icmpTunneling() {
+
+        return sampleService.icmpTunneling();
+    }
+
+    @RequestMapping(value = "/outboundPortAbuse",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> outboundPortAbuse() {
+
+        return sampleService.outboundPortAbuse();
+    }
 }
