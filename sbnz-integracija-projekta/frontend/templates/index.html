@@ -9,19 +9,24 @@
 <body>
     {% import "macros.html" as macros %}
     <h1>Drools Frontend</h1>
-    <form action="{{ url_for('run_drools') }}" method="post">
-        <button type="submit">Skeniraj uređaje</button>
-    </form>
-    <form action="{{ url_for('run_drools_network') }}" method="post">
-        <button type="submit">Skeniraj mrežne servise</button>
-    </form>
-
     <form action="{{ url_for('run_outbound_port_abuse') }}" method="post">
         <button type="submit">Proveri Outbound Port Abuse</button>
     </form>
 
     <form action="{{ url_for('run_outbound_icmp_tuneling') }}" method="post">
         <button type="submit">Proveri Outbound ICMP Tunneling</button>
+    </form>
+
+    <form action="{{ url_for('run_outbound_dns_tunneling') }}" method="post">
+        <button type="submit">Proveri Outbound DNS Tunneling</button>
+    </form>
+
+    <form action="{{ url_for('run_outbound_distributed_syn_flood') }}" method="post">
+        <button type="submit">Proveri Outbound Distributed SYN Flood</button>
+    </form>
+
+    <form action="{{ url_for('run_outbound_syn_flood') }}" method="post">
+        <button type="submit">Proveri Outbound SYN Flood</button>
     </form>
 
     {% if result %}
@@ -43,23 +48,23 @@
         {% endif %}
         
         <!-- Tabela uređaja -->
-        {% if result.devices %}
+        <!-- {% if result.devices %}
             {{ macros.render_table(
                 ['IP adresa', 'OS Name', 'OS Type', 'OS Version'],
                 devices
             ) }}
         {% endif %}
-        {% endif %}
+        {% endif %} -->
     
 
 
-    {% if tempsession_table %}
+    <!-- {% if tempsession_table %}
         <h3>Rezultat skeniranja mrežnih servisa</h3>
         {{ macros.render_table(
             ['ID', 'Device IP', 'Naziv / CVE kod', 'Verzija / Severity', 'Port', 'Opis / Rationale'],
             tempsession_table
         ) }}
-    {% endif %}
+    {% endif %} -->
 
 
 
@@ -92,15 +97,6 @@
         {{ macros.render_table(
             ['ID', 'Message', 'Timestamp'],
             recommendations_table
-        ) }}
-    {% endif %}
-
-
-    {% if cep_session_objects %}
-        <h3>CEP Session Objects</h3>
-        {{ macros.render_table(
-            ['ID', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Protocol', 'Flags', 'Payload Size', 'DNS Query', 'Execution Time'],
-            cep_session_objects
         ) }}
     {% endif %}
 

@@ -137,9 +137,9 @@ def run_outbound_icmp_tuneling():
         result = response.json()
 
         # --- Priprema tabela ---
-        cep_session_objects = []
-        for pkt in result.get("cepSessionObjects", []):
-            cep_session_objects.append([
+        packets_table = []
+        for pkt in result.get("Packets", []):
+            packets_table.append([
                 pkt.get("id", ""),
                 pkt.get("sourceIP", ""),
                 pkt.get("destinationIP", ""),
@@ -183,12 +183,211 @@ def run_outbound_icmp_tuneling():
         return render_template(
             "index.html",
             result=result,
-            cep_session_objects=cep_session_objects,
+            packets_table=packets_table,
+            alerts_table=alerts_table,
+            vulnerabilities_table=vulnerabilities_table,
+            recommendations_table=recommendations_table
         )
 
     except Exception as e:
         result = {"error": str(e)}
         return render_template("index.html", result=result)
+    
+@app.route("/run-outbound-dns-tunneling", methods=["POST"])
+def run_outbound_dns_tunneling():
+    drools_url = "http://localhost:8080/dnsTunneling"
+    try:
+        response = requests.post(drools_url, json={})
+        response.raise_for_status()
+        result = response.json()
+
+        # --- Priprema tabela ---
+        packets_table = []
+        for pkt in result.get("Packets", []):
+            packets_table.append([
+                pkt.get("id", ""),
+                pkt.get("sourceIP", ""),
+                pkt.get("destinationIP", ""),
+                pkt.get("sourcePort", ""),
+                pkt.get("destinationPort", ""),
+                pkt.get("protocol", ""),
+                ", ".join(pkt.get("flags", [])),
+                pkt.get("payloadSize", ""),
+                pkt.get("dnsQuery", ""),
+                pkt.get("executionTime", "")
+            ])
+
+        alerts_table = []
+        for alert in result.get("Alerts", []):
+            alerts_table.append([
+                alert.get("id", ""),
+                alert.get("code", ""),
+                alert.get("severity", ""),
+                alert.get("description", ""),
+                alert.get("executionTime", "")
+            ])
+
+        vulnerabilities_table = []
+        for vuln in result.get("Vulnerabilities", []):
+            vulnerabilities_table.append([
+                vuln.get("id", ""),
+                vuln.get("name", ""),
+                vuln.get("severity", ""),
+                vuln.get("description", "")
+            ])
+
+        recommendations_table = []
+        for rec in result.get("Recommendations", []):
+            recommendations_table.append([
+                rec.get("id", ""),
+                rec.get("message", ""),
+                rec.get("timestamp", "")
+            ])
+
+        # Prosledi sve template-u
+        return render_template(
+            "index.html",
+            result=result,
+            packets_table=packets_table,
+            alerts_table=alerts_table,
+            vulnerabilities_table=vulnerabilities_table,
+            recommendations_table=recommendations_table
+        )
+
+    except Exception as e:
+        result = {"error": str(e)}
+        return render_template("index.html", result=result)
+
+@app.route("/run-outbound-distributed-syn-flood", methods=["POST"])
+def run_outbound_distributed_syn_flood():
+    drools_url = "http://localhost:8080/distributedSynFlood"
+    try:
+        response = requests.post(drools_url, json={})
+        response.raise_for_status()
+        result = response.json()
+
+        # --- Priprema tabela ---
+        packets_table = []
+        for pkt in result.get("Packets", []):
+            packets_table.append([
+                pkt.get("id", ""),
+                pkt.get("sourceIP", ""),
+                pkt.get("destinationIP", ""),
+                pkt.get("sourcePort", ""),
+                pkt.get("destinationPort", ""),
+                pkt.get("protocol", ""),
+                ", ".join(pkt.get("flags", [])),
+                pkt.get("payloadSize", ""),
+                pkt.get("dnsQuery", ""),
+                pkt.get("executionTime", "")
+            ])
+
+        alerts_table = []
+        for alert in result.get("Alerts", []):
+            alerts_table.append([
+                alert.get("id", ""),
+                alert.get("code", ""),
+                alert.get("severity", ""),
+                alert.get("description", ""),
+                alert.get("executionTime", "")
+            ])
+
+        vulnerabilities_table = []
+        for vuln in result.get("Vulnerabilities", []):
+            vulnerabilities_table.append([
+                vuln.get("id", ""),
+                vuln.get("name", ""),
+                vuln.get("severity", ""),
+                vuln.get("description", "")
+            ])
+
+        recommendations_table = []
+        for rec in result.get("Recommendations", []):
+            recommendations_table.append([
+                rec.get("id", ""),
+                rec.get("message", ""),
+                rec.get("timestamp", "")
+            ])
+
+        # Prosledi sve template-u
+        return render_template(
+            "index.html",
+            result=result,
+            packets_table=packets_table,
+            alerts_table=alerts_table,
+            vulnerabilities_table=vulnerabilities_table,
+            recommendations_table=recommendations_table
+        )
+
+    except Exception as e:
+        result = {"error": str(e)}
+        return render_template("index.html", result=result)
+    
+
+@app.route("/run-outbound-syn-flood", methods=["POST"])
+def run_outbound_syn_flood():
+    drools_url = "http://localhost:8080/synFlood"
+    try:
+        response = requests.post(drools_url, json={})
+        response.raise_for_status()
+        result = response.json()
+
+        # --- Priprema tabela ---
+        packets_table = []
+        for pkt in result.get("Packets", []):
+            packets_table.append([
+                pkt.get("id", ""),
+                pkt.get("sourceIP", ""),
+                pkt.get("destinationIP", ""),
+                pkt.get("sourcePort", ""),
+                pkt.get("destinationPort", ""),
+                pkt.get("protocol", ""),
+                ", ".join(pkt.get("flags", [])),
+                pkt.get("payloadSize", ""),
+                pkt.get("dnsQuery", ""),
+                pkt.get("executionTime", "")
+            ])
+
+        alerts_table = []
+        for alert in result.get("Alerts", []):
+            alerts_table.append([
+                alert.get("id", ""),
+                alert.get("code", ""),
+                alert.get("severity", ""),
+                alert.get("description", ""),
+                alert.get("executionTime", "")
+            ])
+
+        vulnerabilities_table = []
+        for vuln in result.get("Vulnerabilities", []):
+            vulnerabilities_table.append([
+                vuln.get("id", ""),
+                vuln.get("name", ""),
+                vuln.get("severity", ""),
+                vuln.get("description", "")
+            ])
+
+        recommendations_table = []
+        for rec in result.get("Recommendations", []):
+            recommendations_table.append([
+                rec.get("id", ""),
+                rec.get("message", ""),
+                rec.get("timestamp", "")
+            ])
+
+        # Prosledi sve template-u
+        return render_template(
+            "index.html",
+            result=result,
+            packets_table=packets_table,
+            alerts_table=alerts_table,
+            vulnerabilities_table=vulnerabilities_table,
+            recommendations_table=recommendations_table
+        )
+
+    except Exception as e:
+        result = {"error": str(e)}
+        return render_template("index.html", result=result) 
 
 
 if __name__ == "__main__":
