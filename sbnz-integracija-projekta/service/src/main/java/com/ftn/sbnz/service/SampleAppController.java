@@ -66,6 +66,15 @@ public class SampleAppController {
 		return result;
 	}
 
+    @RequestMapping(value = "/scanNestworkService",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> scanNestowrkService() {
+
+        return sampleService.insertServicesAndTrack();
+    }
+
     @RequestMapping(value = "/packet",
             method = RequestMethod.POST,
             consumes = "application/json",
