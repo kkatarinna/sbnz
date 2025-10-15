@@ -1,4 +1,4 @@
-package com.ftn.sbnz.service.Inserts;
+package com.ftn.sbnz.service.cep1Attacks;
 
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.NetworkService;
