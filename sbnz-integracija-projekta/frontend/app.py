@@ -308,7 +308,7 @@ def run_outbound_distributed_syn_flood():
                 pkt.get("protocol", ""),
                 ", ".join(pkt.get("flags", [])),
                 pkt.get("payloadSize", ""),
-                pkt.get("dnsQuery", ""),
+                pkt.get("dnsQuery") if pkt.get("dnsQuery") is not None else "",
                 pkt.get("executionTime", "")
             ])
 
@@ -630,7 +630,7 @@ def run_scan_network_service():
         for vuln in result.get("Vulnerabilities", []):
             vulnerabilities_table.append([
                 vuln.get("id", ""),
-                vuln.get("name", ""),
+                vuln.get("code", ""),
                 vuln.get("severity", ""),
                 vuln.get("description", "")
             ])

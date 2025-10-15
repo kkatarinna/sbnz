@@ -9,6 +9,13 @@
 <body>
     {% import "macros.html" as macros %}
     <h1>Drools Frontend</h1>
+    <form action="{{ url_for('run_scan_network_service') }}" method="post">
+        <button type="submit">Proveri Skeniranje Mrežnih Servisa</button>
+    </form>
+
+    <form action="{{ url_for('run_devices') }}" method="post">
+        <button type="submit">Skeniraj Uređaje</button>
+    </form>
     <div class="button-grid">
         <form action="{{ url_for('run_outbound_port_abuse') }}" method="post">
             <button type="submit">Proveri Outbound Port Abuse</button>
@@ -37,14 +44,7 @@
         <form action="{{ url_for('run_suspicious_packet') }}" method="post">
             <button type="submit">Proveri Suspicious Packet</button>
         </form>
-
-        <form action="{{ url_for('run_scan_network_service') }}" method="post">
-            <button type="submit">Proveri Skeniranje Mrežnih Servisa</button>
-        </form>
-
-        <form action="{{ url_for('run_devices') }}" method="post">
-            <button type="submit">Skeniraj Uređaje</button>
-        </form>
+        
     </div>
 
 
@@ -114,7 +114,7 @@
     {% if vulnerabilities_table %}
         <h3>Vulnerabilities</h3>
         {{ macros.render_table(
-            ['ID', 'Name', 'Severity', 'Description'],
+            ['ID', 'Code', 'Severity', 'Description'],
             vulnerabilities_table
         ) }}
     {% endif %}
