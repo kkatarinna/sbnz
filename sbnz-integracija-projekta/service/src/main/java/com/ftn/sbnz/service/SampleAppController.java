@@ -78,13 +78,23 @@ public class SampleAppController {
         return result;
     }
 
+
+    @RequestMapping(value = "/scanDevice",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public ResponseEntity<Map<String, Object>> scanDevice() {
+        Map<String, Object> result = sampleService.scanDevice();
+        return ResponseEntity.ok(result);
+    }
+
     @RequestMapping(value = "/scanNetworkService",
             method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
     public Map<String, Object> scanNetworkService() {
 
-        return sampleService.insertServicesAndTrack();
+        return sampleService.scanServices();
     }
     @RequestMapping(value = "/suspiciousPacket",
             method = RequestMethod.POST,

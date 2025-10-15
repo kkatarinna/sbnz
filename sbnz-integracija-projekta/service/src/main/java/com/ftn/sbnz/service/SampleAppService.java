@@ -12,6 +12,8 @@ import com.ftn.sbnz.service.Mapper.PacketMapper;
 import com.ftn.sbnz.service.cep2Attacks.DnsTunneling;
 import com.ftn.sbnz.service.cep2Attacks.IcmpTunneling;
 import com.ftn.sbnz.service.cep2Attacks.OutBoundPortAbuse;
+import com.ftn.sbnz.service.insert.InsertDevices;
+import com.ftn.sbnz.service.insert.InsertServices;
 import com.ftn.sbnz.service.sessionUtils.SessionUtils;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
@@ -185,17 +187,53 @@ public class SampleAppService {
         PacketEvent packet = packetMapper.toEntity(packetDTO);
         cepSession.insert(packet);
         cepSession2.insert(packet);
+
         int countCEP = cepSession.fireAllRules();
         int countCEP2 = cepSession2.fireAllRules();
-        response.put("countCep: ", countCEP + countCEP2);
-        response.put("firedCEPRules", firedRulesCEP);
-        response.put("firedCEP2Rules", firedRulesCEP2);
+
         response.put("CEPsessionObjects", cepSession.getObjects());
         response.put("CEPsession2Objects", cepSession2.getObjects());
+
+        if(countCEP + countCEP2 != 0){
+            response.put("count: ", countCEP + countCEP2);
+            response.put("firedRules", firedRulesCEP.addAll(firedRulesCEP2));
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession).addAll(SessionUtils.getPacketEvents(this.cepSession2)));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession).addAll(SessionUtils.getAlerts(this.cepSession2)));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession).addAll(SessionUtils.getVulnerability(this.cepSession2)));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession).addAll(SessionUtils.getRecommendations(this.cepSession2)));
+        }
         return response;
     }
 
-    public  Map<String, Object> insertServicesAndTrack(){
+    public Map<String, Object> scanDevice() {
+        List<Device> devices = InsertDevices.generateDevices();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRulesTemp = new ArrayList<>();
+
+        tempSession2.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesTemp.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        for(Device device : devices) {
+            tempSession2.insert(device);
+        }
+
+        int countTemp = tempSession2.fireAllRules();
+
+        response.put("count: ",  countTemp);
+        response.put("firedRules", firedRulesTemp);
+        response.put("Devices", SessionUtils.getDevices(this.tempSession2));
+        response.put("Alerts", SessionUtils.getAlerts(this.tempSession2));
+        response.put("Vulnerabilities", SessionUtils.getVulnerability(this.tempSession2));
+        response.put("Recommendations", SessionUtils.getRecommendations(this.tempSession2));
+
+        return response;
+    }
+
+    public  Map<String, Object> scanServices(){
         List<NetworkService> services = InsertServices.generateNetworkServices();
         Map<String, Object> response = new HashMap<>();
         List<String> firedRulesFW = new ArrayList<>();
@@ -222,14 +260,14 @@ public class SampleAppService {
         int countFW = fwSession.fireAllRules();
         int countTemp = tempSession.fireAllRules();
 
-        response.put("countFW: ", countFW);
-        response.put("firedFWRules", firedRulesFW);
-        response.put("FWsessionObjects", fwSession.getObjects());
-
-        response.put("countTemp: ", countTemp);
-        response.put("firedTempRules", firedRulesTemp);
-        response.put("TempsessionObjects", tempSession.getObjects());
-
+        if(countFW + countTemp != 0){
+            response.put("count: ", countFW + countTemp);
+            response.put("firedRules", firedRulesFW.addAll(firedRulesTemp));
+            response.put("Packets", SessionUtils.getPacketEvents(this.tempSession).addAll(SessionUtils.getPacketEvents(this.fwSession)));
+            response.put("Alerts", SessionUtils.getAlerts(this.tempSession).addAll(SessionUtils.getAlerts(this.fwSession)));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.tempSession).addAll(SessionUtils.getVulnerability(this.fwSession)));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.tempSession).addAll(SessionUtils.getRecommendations(this.fwSession)));
+        }
         return response;
     }
 
@@ -240,13 +278,12 @@ public class SampleAppService {
         this.cepSession.getFactHandles().forEach(this.cepSession::delete);
         ArrayList<PacketEvent> suspiciousPackets = InsertSuspiciousPackets.generateSuspiciousPacket();
         Map<String, Object> response = new HashMap<>();
-        List<String> firedRulesFW = new ArrayList<>();
-        List<String> firedRulesTemp = new ArrayList<>();
+        List<String> fiderRulesCep = new ArrayList<>();
 
         this.cepSession.addEventListener(new DefaultAgendaEventListener() {
             @Override
             public void afterMatchFired(AfterMatchFiredEvent event) {
-                firedRulesFW.add(event.getMatch().getRule().getName());
+                fiderRulesCep.add(event.getMatch().getRule().getName());
             }
         });
 
@@ -258,9 +295,12 @@ public class SampleAppService {
         int countcep = this.cepSession.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", firedRulesFW);
-            response.put("cepSessionObjects", this.cepSession.getObjects());
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession));
         }
         return response;
     }
@@ -287,9 +327,12 @@ public class SampleAppService {
         int countcep = this.cepSession.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", fiderRulesCep);
-            response.put("cepSessionObjects", this.cepSession.getObjects());
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession));
         }
         return response;
     }
@@ -315,9 +358,12 @@ public class SampleAppService {
         int countcep = this.cepSession.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", fiderRulesCep);
-            response.put("cepSessionObjects", this.cepSession.getObjects());
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession));
         }
         return response;
     }
@@ -343,9 +389,12 @@ public class SampleAppService {
         int countcep = this.cepSession.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", fiderRulesCep);
-            response.put("cepSessionObjects", this.cepSession.getObjects());
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession));
         }
         return response;
     }
@@ -371,9 +420,12 @@ public class SampleAppService {
         int countcep = this.cepSession2.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", fiderRulesCep);
-            response.put("cepSessionObjects", this.cepSession2.getObjects());
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession2));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession2));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession2));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession2));
         }
         return response;
     }
@@ -399,9 +451,12 @@ public class SampleAppService {
         int countcep = this.cepSession2.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", fiderRulesCep);
-            response.put("cepSessionObjects", this.cepSession2.getObjects());
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
+            response.put("Packets", SessionUtils.getPacketEvents(this.cepSession2));
+            response.put("Alerts", SessionUtils.getAlerts(this.cepSession2));
+            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession2));
+            response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession2));
         }
         return response;
     }
@@ -427,8 +482,8 @@ public class SampleAppService {
         int countcep = this.cepSession2.fireAllRules();
 
         if(countcep != 0) {
-            response.put("countCep: ", countcep);
-            response.put("firedCepRules", fiderRulesCep);
+            response.put("count: ", countcep);
+            response.put("firedRules", fiderRulesCep);
             response.put("Packets", SessionUtils.getPacketEvents(this.cepSession2));
             response.put("Alerts", SessionUtils.getAlerts(this.cepSession2));
             response.put("Vulnerabilities", SessionUtils.getVulnerability(this.cepSession2));
@@ -436,4 +491,5 @@ public class SampleAppService {
         }
         return response;
     }
+
 }
