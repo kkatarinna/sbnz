@@ -10,4 +10,5 @@ import lombok.Setter;
 public class DeviceDTO {
     private String ip;
     private String os;
+    private String type;
 }

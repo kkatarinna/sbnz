@@ -92,7 +92,7 @@ public class SampleAppService {
 	/**
 	 * Ubacuje Device u sesiju, aktivira pravila i vraća informacije o sesiji
 	 */
-	public Map<String, Object> insertDeviceAndTrack(DeviceDTO deviceDTO) {
+	public Map<String, Object> insertDeviceAndTrack(List<Device> device) {
 		Map<String, Object> response = new HashMap<>();
 		List<String> firedRules = new ArrayList<>();
 
@@ -103,9 +103,9 @@ public class SampleAppService {
             }
         });
 
-        Device device = deviceMapper.toEntity(deviceDTO);
-
-        tempSession.insert(device);
+        for (Device d : device) {
+            tempSession.insert(d);
+        }
         int countTemp = tempSession.fireAllRules();
         if(countTemp != 0) {
             response.put("countTemp: ", countTemp);

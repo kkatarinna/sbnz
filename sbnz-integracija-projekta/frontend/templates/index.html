@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drools Frontend</title>
+</head>
+<body>
+    <h1>Drools Frontend</h1>
+    <form action="{{ url_for('run_drools') }}" method="post">
+        <button type="submit">Dodaj uređaje</button>
+    </form>
+
+    {% if result %}
+    <div class="result-box">
+        <pre>{{ result | tojson(indent=2) }}</pre>
+        <pre>{{ result.device | tojson(indent=2)}}</pre>
+        <div class="message">{{ result.message }}</div>
+        {% if result.device %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>IP adresa</th>
+                <th>OS Name</th>
+                <th>OS Type</th>
+                <th>OS Version</th>
+            </tr>
+            {% for dev in result.device  %}
+            <tr>
+                <td>{{ dev.id }}</td>
+                <td>{{ dev.ip }}</td>
+                <td>{{ dev.osName }}</td>
+                <td>{{ dev.osType }}</td>
+                <td>{{ dev.osVersion }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>Nema uređaja u odgovoru.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>
