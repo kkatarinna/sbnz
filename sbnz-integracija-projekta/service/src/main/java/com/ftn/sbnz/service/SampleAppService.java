@@ -108,14 +108,16 @@ public class SampleAppService {
         });
 
         for (Device d : device) {
-            tempSession.insert(d);
+            tempSession2.insert(d);
         }
-        int countTemp = tempSession.fireAllRules();
+        int countTemp = tempSession2.fireAllRules();
+
         if(countTemp != 0) {
-            response.put("countTemp: ", countTemp);
+            response.put("countTemp", countTemp);
             response.put("firedTempRules", firedRules);
-            response.put("TempsessionObjects", tempSession.getObjects());
+            response.put("TempsessionObjects", tempSession2.getObjects());
         }
+        System.out.println("COUNT TEMP"+response.get("countTemp"));
 		return response;
 	}
 
@@ -193,9 +195,46 @@ public class SampleAppService {
         return response;
     }
 
-    public  Map<String, Object> scanServices(){
-        return InsertServices.insertServicesAndTrack(this.tempSession2, this.fwSession);
+    public  Map<String, Object> insertServicesAndTrack(){
+        List<NetworkService> services = InsertServices.generateNetworkServices();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRulesFW = new ArrayList<>();
+        List<String> firedRulesTemp = new ArrayList<>();
+
+        fwSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesFW.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        tempSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesTemp.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        for(NetworkService service : services) {
+            fwSession.insert(service);
+            tempSession.insert(service);
+        }
+        int countFW = fwSession.fireAllRules();
+        int countTemp = tempSession.fireAllRules();
+
+        response.put("countFW: ", countFW);
+        response.put("firedFWRules", firedRulesFW);
+        response.put("FWsessionObjects", fwSession.getObjects());
+
+        response.put("countTemp: ", countTemp);
+        response.put("firedTempRules", firedRulesTemp);
+        response.put("TempsessionObjects", tempSession.getObjects());
+
+        return response;
     }
+
+//        return InsertServices.insertServicesAndTrack(this.tempSession2, this.fwSession);
+
 
     public Map<String,Object> insertSuspiciousPacket(){
         this.cepSession.getFactHandles().forEach(this.cepSession::delete);
