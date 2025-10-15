@@ -9,6 +9,7 @@ import com.ftn.sbnz.service.DTO.NetworkServiceDTO;
 import com.ftn.sbnz.service.DTO.PacketDTO;
 import com.ftn.sbnz.service.Inserts.InsertServices;
 import com.ftn.sbnz.service.Inserts.InsertSuspiciousPackets;
+import com.ftn.sbnz.service.Inserts.NetworkScanAttack;
 import com.ftn.sbnz.service.Mapper.DeviceMapper;
 import com.ftn.sbnz.service.Mapper.NetworkServiceMapper;
 import com.ftn.sbnz.service.Mapper.PacketMapper;
@@ -199,8 +200,61 @@ public class SampleAppService {
     }
 
     public Map<String,Object> insertSuspiciousPacket(){
-        return InsertSuspiciousPackets.insertSuspiciousPackets(this.cepSession);
+        this.cepSession.getFactHandles().forEach(this.cepSession::delete);
+        ArrayList<PacketEvent> suspiciousPackets = InsertSuspiciousPackets.generateSuspiciousPacket();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRulesFW = new ArrayList<>();
+        List<String> firedRulesTemp = new ArrayList<>();
+
+        this.cepSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesFW.add(event.getMatch().getRule().getName());
+            }
+        });
+
+
+        for(PacketEvent packet : suspiciousPackets) {
+            this.cepSession.insert(packet);
+
+        }
+        int countcep = this.cepSession.fireAllRules();
+
+        if(countcep != 0) {
+            response.put("countCep: ", countcep);
+            response.put("firedCepRules", firedRulesFW);
+            response.put("cepSessionObjects", this.cepSession.getObjects());
+        }
+        return response;
     }
 
 
+    public Map<String, Object> networkScanAttack() {
+        this.cepSession.getFactHandles().forEach(this.cepSession::delete);
+        ArrayList<PacketEvent> suspiciousPackets = NetworkScanAttack.generateManyIPDestinationsSameSource();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRulesFW = new ArrayList<>();
+        List<String> firedRulesTemp = new ArrayList<>();
+
+        this.cepSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesFW.add(event.getMatch().getRule().getName());
+            }
+        });
+
+
+        for(PacketEvent packet : suspiciousPackets) {
+            this.cepSession.insert(packet);
+
+        }
+        int countcep = this.cepSession.fireAllRules();
+
+        if(countcep != 0) {
+            response.put("countCep: ", countcep);
+            response.put("firedCepRules", firedRulesFW);
+            response.put("cepSessionObjects", this.cepSession.getObjects());
+        }
+        return response;
+    }
 }

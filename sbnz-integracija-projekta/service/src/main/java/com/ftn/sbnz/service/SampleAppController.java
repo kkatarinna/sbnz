@@ -83,6 +83,16 @@ public class SampleAppController {
 
         return sampleService.insertSuspiciousPacket();
     }
+
+    @RequestMapping(value = "/networkScanAttack",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> networkScanAttack() {
+
+        return sampleService.networkScanAttack();
+    }
+
 	
 	
 	
