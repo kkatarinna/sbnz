@@ -221,16 +221,15 @@ public class SampleAppService {
             tempSession2.insert(device);
         }
 
-        int countTemp = tempSession.fireAllRules();
+        int countTemp = tempSession2.fireAllRules();
 
-        if(countTemp != 0){
-            response.put("count: ",  countTemp);
-            response.put("firedRules", firedRulesTemp);
-            response.put("Devices", SessionUtils.getDevices(this.tempSession2));
-            response.put("Alerts", SessionUtils.getAlerts(this.tempSession2));
-            response.put("Vulnerabilities", SessionUtils.getVulnerability(this.tempSession2));
-            response.put("Recommendations", SessionUtils.getRecommendations(this.tempSession2));
-        }
+        response.put("count: ",  countTemp);
+        response.put("firedRules", firedRulesTemp);
+        response.put("Devices", SessionUtils.getDevices(this.tempSession2));
+        response.put("Alerts", SessionUtils.getAlerts(this.tempSession2));
+        response.put("Vulnerabilities", SessionUtils.getVulnerability(this.tempSession2));
+        response.put("Recommendations", SessionUtils.getRecommendations(this.tempSession2));
+
         return response;
     }
 
