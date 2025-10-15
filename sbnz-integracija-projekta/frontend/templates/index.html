@@ -16,19 +16,27 @@
         <button type="submit">Skeniraj mrežne servise</button>
     </form>
 
+    <form action="{{ url_for('run_outbound_port_abuse') }}" method="post">
+        <button type="submit">Proveri Outbound Port Abuse</button>
+    </form>
+
+    <form action="{{ url_for('run_outbound_icmp_tuneling') }}" method="post">
+        <button type="submit">Proveri Outbound ICMP Tunneling</button>
+    </form>
+
     {% if result %}
     <div class="result-box">
         <div class="message">{{ result.message }}</div>
         <!-- Broj aktiviranih pravila -->
-        {% if result.countTemp %}
-            <p><strong>Activated rules:</strong> {{ result.countTemp }}</p>
+        {% if result.count %}
+            <p><strong>Activated rules:</strong> {{ result.count }}</p>
         {% endif %}
 
         <!-- Lista fired pravila -->
-        {% if result.firedTempRules %}
+        {% if result.firedRules %}
             <p><strong>Rules:</strong></p>
             <ul>
-                {% for rule in result.firedTempRules %}
+                {% for rule in result.firedRules %}
                     <li>{{ rule }}</li>
                 {% endfor %}
             </ul>
@@ -52,6 +60,50 @@
             tempsession_table
         ) }}
     {% endif %}
+
+
+
+    {% if packets_table %}
+        <h3>Packets</h3>
+        {{ macros.render_table(
+            ['ID', 'Source IP', 'Dest IP', 'Source Port', 'Dest Port', 'Protocol', 'Flags', 'Payload Size', 'DNS Query', 'Execution Time'],
+            packets_table
+        ) }}
+    {% endif %}
+
+    {% if alerts_table %}
+        <h3>Alerts</h3>
+        {{ macros.render_table(
+            ['ID', 'Code', 'Severity', 'Description', 'Execution Time'],
+            alerts_table
+        ) }}
+    {% endif %}
+
+    {% if vulnerabilities_table %}
+        <h3>Vulnerabilities</h3>
+        {{ macros.render_table(
+            ['ID', 'Name', 'Severity', 'Description'],
+            vulnerabilities_table
+        ) }}
+    {% endif %}
+
+    {% if recommendations_table %}
+        <h3>Recommendations</h3>
+        {{ macros.render_table(
+            ['ID', 'Message', 'Timestamp'],
+            recommendations_table
+        ) }}
+    {% endif %}
+
+
+    {% if cep_session_objects %}
+        <h3>CEP Session Objects</h3>
+        {{ macros.render_table(
+            ['ID', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port', 'Protocol', 'Flags', 'Payload Size', 'DNS Query', 'Execution Time'],
+            cep_session_objects
+        ) }}
+    {% endif %}
+
     </div>
 
 </body>

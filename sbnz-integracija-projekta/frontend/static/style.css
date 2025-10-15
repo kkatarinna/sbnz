@@ -38,7 +38,7 @@ body {
             background: white;
             border-radius: 10px;
             padding: 30px;
-            max-width: 1000px;
+            max-width: 1500px;
             margin: 0 auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
@@ -58,7 +58,7 @@ body {
         }
 
         th, td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: center;
             border-bottom: 1px solid #ddd;
         }
