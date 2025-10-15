@@ -111,9 +111,30 @@ public class SampleAppController {
         return sampleService.distributedSynFlood();
     }
 
-    
+    @RequestMapping(value = "/dnsTunneling",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> dnsTunneling() {
 
-	
-	
-	
+        return sampleService.dnsTunneling();
+    }
+
+    @RequestMapping(value = "/icmpTunneling",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> icmpTunneling() {
+
+        return sampleService.icmpTunneling();
+    }
+
+    @RequestMapping(value = "/outboundPortAbuse",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> outboundPortAbuse() {
+
+        return sampleService.outboundPortAbuse();
+    }
 }

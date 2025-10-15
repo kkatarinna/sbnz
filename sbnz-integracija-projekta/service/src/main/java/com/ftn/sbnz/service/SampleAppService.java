@@ -9,6 +9,9 @@ import com.ftn.sbnz.service.cep1Attacks.*;
 import com.ftn.sbnz.service.Mapper.DeviceMapper;
 import com.ftn.sbnz.service.Mapper.NetworkServiceMapper;
 import com.ftn.sbnz.service.Mapper.PacketMapper;
+import com.ftn.sbnz.service.cep2Attacks.DnsTunneling;
+import com.ftn.sbnz.service.cep2Attacks.IcmpTunneling;
+import com.ftn.sbnz.service.cep2Attacks.OutBoundPortAbuse;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.kie.api.runtime.KieSession;
@@ -303,6 +306,90 @@ public class SampleAppService {
             response.put("countCep: ", countcep);
             response.put("firedCepRules", fiderRulesCep);
             response.put("cepSessionObjects", this.cepSession.getObjects());
+        }
+        return response;
+    }
+
+    public Map<String, Object> dnsTunneling() {
+        this.cepSession2.getFactHandles().forEach(this.cepSession2::delete);
+        ArrayList<PacketEvent> suspiciousPackets = DnsTunneling.generateSuspiciousPackets();
+        Map<String, Object> response = new HashMap<>();
+        List<String> fiderRulesCep = new ArrayList<>();
+
+        this.cepSession2.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                fiderRulesCep.add(event.getMatch().getRule().getName());
+            }
+        });
+
+
+        for(PacketEvent packet : suspiciousPackets) {
+            this.cepSession2.insert(packet);
+
+        }
+        int countcep = this.cepSession2.fireAllRules();
+
+        if(countcep != 0) {
+            response.put("countCep: ", countcep);
+            response.put("firedCepRules", fiderRulesCep);
+            response.put("cepSessionObjects", this.cepSession2.getObjects());
+        }
+        return response;
+    }
+
+    public Map<String, Object> icmpTunneling() {
+        this.cepSession2.getFactHandles().forEach(this.cepSession2::delete);
+        ArrayList<PacketEvent> suspiciousPackets = IcmpTunneling.generateSuspiciousPackets();
+        Map<String, Object> response = new HashMap<>();
+        List<String> fiderRulesCep = new ArrayList<>();
+
+        this.cepSession2.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                fiderRulesCep.add(event.getMatch().getRule().getName());
+            }
+        });
+
+
+        for(PacketEvent packet : suspiciousPackets) {
+            this.cepSession2.insert(packet);
+
+        }
+        int countcep = this.cepSession2.fireAllRules();
+
+        if(countcep != 0) {
+            response.put("countCep: ", countcep);
+            response.put("firedCepRules", fiderRulesCep);
+            response.put("cepSessionObjects", this.cepSession2.getObjects());
+        }
+        return response;
+    }
+
+    public Map<String, Object> outboundPortAbuse() {
+        this.cepSession2.getFactHandles().forEach(this.cepSession2::delete);
+        ArrayList<PacketEvent> suspiciousPackets = OutBoundPortAbuse.generateSuspiciousPackets();
+        Map<String, Object> response = new HashMap<>();
+        List<String> fiderRulesCep = new ArrayList<>();
+
+        this.cepSession2.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                fiderRulesCep.add(event.getMatch().getRule().getName());
+            }
+        });
+
+
+        for(PacketEvent packet : suspiciousPackets) {
+            this.cepSession2.insert(packet);
+
+        }
+        int countcep = this.cepSession2.fireAllRules();
+
+        if(countcep != 0) {
+            response.put("countCep: ", countcep);
+            response.put("firedCepRules", fiderRulesCep);
+            response.put("cepSessionObjects", this.cepSession2.getObjects());
         }
         return response;
     }
