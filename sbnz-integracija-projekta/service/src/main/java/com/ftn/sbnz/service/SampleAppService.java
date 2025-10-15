@@ -1,15 +1,18 @@
 package com.ftn.sbnz.service;
 
+import com.ftn.sbnz.model.enums.Flag;
+import com.ftn.sbnz.model.enums.Protocol;
 import com.ftn.sbnz.model.events.PacketEvent;
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.NetworkService;
-import com.ftn.sbnz.service.DTO.DeviceDTO;
 import com.ftn.sbnz.service.DTO.NetworkServiceDTO;
 import com.ftn.sbnz.service.DTO.PacketDTO;
 import com.ftn.sbnz.service.Inserts.InsertServices;
+import com.ftn.sbnz.service.Inserts.InsertSuspiciousPackets;
 import com.ftn.sbnz.service.Mapper.DeviceMapper;
 import com.ftn.sbnz.service.Mapper.NetworkServiceMapper;
 import com.ftn.sbnz.service.Mapper.PacketMapper;
+import org.drools.core.phreak.PropagationEntry;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.kie.api.runtime.KieSession;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 @Service
@@ -190,7 +194,13 @@ public class SampleAppService {
         return response;
     }
 
-    public  Map<String, Object> insertServicesAndTrack(){
+    public  Map<String, Object> scanServices(){
         return InsertServices.insertServicesAndTrack(this.tempSession2, this.fwSession);
     }
+
+    public Map<String,Object> insertSuspiciousPacket(){
+        return InsertSuspiciousPackets.insertSuspiciousPackets(this.cepSession);
+    }
+
+
 }

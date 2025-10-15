@@ -56,15 +56,6 @@ public class SampleAppController {
 		return result;
 	}
 
-    @RequestMapping(value = "/scanNestworkService",
-            method = RequestMethod.POST,
-            consumes = "application/json",
-            produces = "application/json")
-    public Map<String, Object> scanNestowrkService() {
-
-        return sampleService.insertServicesAndTrack();
-    }
-
     @RequestMapping(value = "/packet",
             method = RequestMethod.POST,
             consumes = "application/json",
@@ -74,6 +65,23 @@ public class SampleAppController {
         Map<String, Object> result = sampleService.insertPacketAndTrack(packet);
 
         return result;
+    }
+
+    @RequestMapping(value = "/scanNetworkService",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> scanNetworkService() {
+
+        return sampleService.scanServices();
+    }
+    @RequestMapping(value = "/suspiciousPacket",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> insertSuspiciousPacket() {
+
+        return sampleService.insertSuspiciousPacket();
     }
 	
 	
