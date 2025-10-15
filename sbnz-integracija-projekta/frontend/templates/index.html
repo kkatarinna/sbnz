@@ -9,25 +9,44 @@
 <body>
     {% import "macros.html" as macros %}
     <h1>Drools Frontend</h1>
-    <form action="{{ url_for('run_outbound_port_abuse') }}" method="post">
-        <button type="submit">Proveri Outbound Port Abuse</button>
-    </form>
+    <div class="button-grid">
+        <form action="{{ url_for('run_outbound_port_abuse') }}" method="post">
+            <button type="submit">Proveri Outbound Port Abuse</button>
+        </form>
 
-    <form action="{{ url_for('run_outbound_icmp_tuneling') }}" method="post">
-        <button type="submit">Proveri Outbound ICMP Tunneling</button>
-    </form>
+        <form action="{{ url_for('run_outbound_icmp_tuneling') }}" method="post">
+            <button type="submit">Proveri ICMP Tunneling</button>
+        </form>
 
-    <form action="{{ url_for('run_outbound_dns_tunneling') }}" method="post">
-        <button type="submit">Proveri Outbound DNS Tunneling</button>
-    </form>
+        <form action="{{ url_for('run_outbound_dns_tunneling') }}" method="post">
+            <button type="submit">Proveri DNS Tunneling</button>
+        </form>
 
-    <form action="{{ url_for('run_outbound_distributed_syn_flood') }}" method="post">
-        <button type="submit">Proveri Outbound Distributed SYN Flood</button>
-    </form>
+        <form action="{{ url_for('run_outbound_distributed_syn_flood') }}" method="post">
+            <button type="submit">Proveri Distributed SYN Flood</button>
+        </form>
 
-    <form action="{{ url_for('run_outbound_syn_flood') }}" method="post">
-        <button type="submit">Proveri Outbound SYN Flood</button>
-    </form>
+        <form action="{{ url_for('run_outbound_syn_flood') }}" method="post">
+            <button type="submit">Proveri SYN Flood</button>
+        </form>
+
+        <form action="{{ url_for('run_outbound_network_scan_attack') }}" method="post">
+            <button type="submit">Proveri Network Scan Attack</button>
+        </form>
+
+        <form action="{{ url_for('run_suspicious_packet') }}" method="post">
+            <button type="submit">Proveri Suspicious Packet</button>
+        </form>
+
+        <form action="{{ url_for('run_scan_network_service') }}" method="post">
+            <button type="submit">Proveri Skeniranje Mrežnih Servisa</button>
+        </form>
+
+        <form action="{{ url_for('run_devices') }}" method="post">
+            <button type="submit">Skeniraj Uređaje</button>
+        </form>
+    </div>
+
 
     {% if result %}
     <div class="result-box">
@@ -76,6 +95,14 @@
         ) }}
     {% endif %}
 
+    {% if device_table %}
+        <h3>Devices</h3>
+        {{ macros.render_table(
+            ['IP adresa', 'OS Name', 'OS Type', 'OS Version'],
+            device_table
+        ) }}
+    {% endif %}
+
     {% if alerts_table %}
         <h3>Alerts</h3>
         {{ macros.render_table(
@@ -95,7 +122,7 @@
     {% if recommendations_table %}
         <h3>Recommendations</h3>
         {{ macros.render_table(
-            ['ID', 'Message', 'Timestamp'],
+            ['ID', 'Action', 'Rational'],
             recommendations_table
         ) }}
     {% endif %}

@@ -79,3 +79,34 @@ body {
             font-style: italic;
             color: #636e72;
         }
+
+        /* Flex raspored za dugmad */
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;      /* prelomi u sledeći red kad nema mesta */
+  gap: 12px;            /* razmak između dugmadi */
+  align-items: center;
+  justify-content: flex-start; /* ili center */
+  margin: 12px 0;
+}
+
+/* uklanja default marginu forme i čini ih nevidljivima kao blok */
+.button-grid form {
+  margin: 0;
+}
+
+/* stil za dugmad da izgledaju lepo */
+.button-grid button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #2c7be5;
+  background: #2c7be5;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* hover */
+.button-grid button:hover {
+  filter: brightness(0.95);
+}
