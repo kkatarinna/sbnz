@@ -1,22 +1,21 @@
-package com.ftn.sbnz.service.Inserts;
+package com.ftn.sbnz.service.cep1Attacks;
 
 import com.ftn.sbnz.model.enums.Flag;
 import com.ftn.sbnz.model.enums.Protocol;
 import com.ftn.sbnz.model.events.PacketEvent;
-import org.kie.api.event.rule.AfterMatchFiredEvent;
-import org.kie.api.event.rule.DefaultAgendaEventListener;
-import org.kie.api.runtime.KieSession;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class NetworkScanAttack {
+public class SynFlood {
 
 
-        public static ArrayList<PacketEvent> generateManyIPDestinationsSameSource() {
+    public static ArrayList<PacketEvent> generateSynFlood() {
         PacketEvent packet1 = new PacketEvent();
         packet1.setSourceIP("172.16.1.1");
         packet1.setSourcePort(6052);
-        packet1.setDestinationIP("192.168.1.100");
+        packet1.setDestinationIP("192.168.1.101");
         packet1.setDestinationPort(22);
         packet1.setFlags(new ArrayList<>(List.of(Flag.SYN)));
         packet1.setProtocol(Protocol.TCP);
@@ -33,7 +32,7 @@ public class NetworkScanAttack {
         PacketEvent packet3 = new PacketEvent();
         packet3.setSourceIP("172.16.1.1");
         packet3.setSourcePort(6054);
-        packet3.setDestinationIP("192.168.1.102");
+        packet3.setDestinationIP("192.168.1.101");
         packet3.setDestinationPort(22);
         packet3.setFlags(new ArrayList<>(List.of(Flag.SYN)));
         packet3.setProtocol(Protocol.TCP);
@@ -41,7 +40,7 @@ public class NetworkScanAttack {
         PacketEvent packet4 = new PacketEvent();
         packet4.setSourceIP("172.16.1.1");
         packet4.setSourcePort(6055);
-        packet4.setDestinationIP("192.168.1.103");
+        packet4.setDestinationIP("192.168.1.101");
         packet4.setDestinationPort(22);
         packet4.setFlags(new ArrayList<>(List.of(Flag.SYN)));
         packet4.setProtocol(Protocol.TCP);

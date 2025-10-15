@@ -1,19 +1,12 @@
-package com.ftn.sbnz.service.Inserts;
+package com.ftn.sbnz.service.cep1Attacks;
 
-import com.ftn.sbnz.model.enums.Flag;
 import com.ftn.sbnz.model.enums.Protocol;
 import com.ftn.sbnz.model.events.PacketEvent;
-import com.ftn.sbnz.model.models.NetworkService;
-import org.kie.api.event.rule.AfterMatchFiredEvent;
-import org.kie.api.event.rule.DefaultAgendaEventListener;
-import org.kie.api.runtime.KieSession;
 
 import java.util.*;
 
 public class InsertSuspiciousPackets {
 
-    public static Map<String, Object> insertSuspiciousPackets(KieSession cep){
-    }
 
     public static ArrayList<PacketEvent> generateSuspiciousPacket() {
         PacketEvent suspiciousIPPacket = new PacketEvent();
@@ -21,7 +14,7 @@ public class InsertSuspiciousPackets {
         suspiciousIPPacket.setSourcePort(6052);
         suspiciousIPPacket.setDestinationIP("192.168.1.100");
         suspiciousIPPacket.setDestinationPort(443);
-        suspiciousIPPacket.setFlags(new ArrayList<>(List.of(Flag.SYN)));
+        suspiciousIPPacket.setFlags(new ArrayList<>(List.of()));
         suspiciousIPPacket.setProtocol(Protocol.TCP);
 
 
@@ -30,7 +23,7 @@ public class InsertSuspiciousPackets {
         suspiciousPortPacket.setSourcePort(6052);
         suspiciousPortPacket.setDestinationIP("192.168.1.101");
         suspiciousPortPacket.setDestinationPort(22);
-        suspiciousPortPacket.setFlags(new ArrayList<>(List.of(Flag.SYN)));
+        suspiciousPortPacket.setFlags(new ArrayList<>(List.of()));
         suspiciousPortPacket.setProtocol(Protocol.TCP);
         return new ArrayList<>(Arrays.asList(suspiciousIPPacket, suspiciousPortPacket));
     }

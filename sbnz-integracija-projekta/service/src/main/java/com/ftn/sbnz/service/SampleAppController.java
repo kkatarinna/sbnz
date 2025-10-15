@@ -102,6 +102,17 @@ public class SampleAppController {
         return sampleService.synFlood();
     }
 
+    @RequestMapping(value = "/distributedSynFlood",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> distributedSynFlood() {
+
+        return sampleService.distributedSynFlood();
+    }
+
+    
+
 	
 	
 	
