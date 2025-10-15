@@ -7,9 +7,13 @@
 
 </head>
 <body>
+    {% import "macros.html" as macros %}
     <h1>Drools Frontend</h1>
     <form action="{{ url_for('run_drools') }}" method="post">
-        <button type="submit">Dodaj uređaje</button>
+        <button type="submit">Skeniraj uređaje</button>
+    </form>
+    <form action="{{ url_for('run_drools_network') }}" method="post">
+        <button type="submit">Skeniraj mrežne servise</button>
     </form>
 
     {% if result %}
@@ -29,27 +33,26 @@
                 {% endfor %}
             </ul>
         {% endif %}
+        
+        <!-- Tabela uređaja -->
         {% if result.devices %}
-        <table>
-            <tr>
-                <th>IP adresa</th>
-                <th>OS Name</th>
-                <th>OS Type</th>
-                <th>OS Version</th>
-            </tr>
-            {% for dev in result.devices  %}
-            <tr>
-                <td>{{ dev.ip }}</td>
-                <td>{{ dev.osName }}</td>
-                <td>{{ dev.osType }}</td>
-                <td>{{ dev.osVersion }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p>Nema uređaja u odgovoru.</p>
+            {{ macros.render_table(
+                ['IP adresa', 'OS Name', 'OS Type', 'OS Version'],
+                devices
+            ) }}
         {% endif %}
-    </div>
+        {% endif %}
+    
+
+
+    {% if tempsession_table %}
+        <h3>Rezultat skeniranja mrežnih servisa</h3>
+        {{ macros.render_table(
+            ['ID', 'Device IP', 'Naziv / CVE kod', 'Verzija / Severity', 'Port', 'Opis / Rationale'],
+            tempsession_table
+        ) }}
     {% endif %}
+    </div>
+
 </body>
 </html>

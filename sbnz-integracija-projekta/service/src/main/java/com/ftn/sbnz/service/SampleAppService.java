@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.ftn.sbnz.service.Inserts.InsertServices.generateNetworkServices;
+
 @Service
 public class SampleAppService {
 
@@ -193,6 +195,42 @@ public class SampleAppService {
     }
 
     public  Map<String, Object> insertServicesAndTrack(){
-        return InsertServices.insertServicesAndTrack(this.tempSession2, this.fwSession);
+        List<NetworkService> services = generateNetworkServices();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRulesFW = new ArrayList<>();
+        List<String> firedRulesTemp = new ArrayList<>();
+
+        fwSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesFW.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        tempSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRulesTemp.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        for(NetworkService service : services) {
+            fwSession.insert(service);
+            tempSession.insert(service);
+        }
+        int countFW = fwSession.fireAllRules();
+        int countTemp = tempSession.fireAllRules();
+
+        response.put("countFW: ", countFW);
+        response.put("firedFWRules", firedRulesFW);
+        response.put("FWsessionObjects", fwSession.getObjects());
+
+        response.put("countTemp: ", countTemp);
+        response.put("firedTempRules", firedRulesTemp);
+        response.put("TempsessionObjects", tempSession.getObjects());
+
+        return response;
+
+//        return InsertServices.insertServicesAndTrack(this.tempSession2, this.fwSession);
     }
 }
