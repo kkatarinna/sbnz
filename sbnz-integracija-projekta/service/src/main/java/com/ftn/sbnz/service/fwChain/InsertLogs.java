@@ -46,6 +46,27 @@ public class InsertLogs {
         log5.setDescription("Possible access to private parts of system");
         log5.setDatetime(new Date());
 
+        Log log6 = new Log();
+        log5.setType(LogType.INFO);
+        log5.setLogTag(LogTag.DATABASE);
+        log5.setSourceIP("192.168.1.99");
+        log5.setDescription("failed to enter database");
+        log5.setDatetime(new Date());
+
+        Log log7 = new Log();
+        log5.setType(LogType.INFO);
+        log5.setLogTag(LogTag.DATABASE);
+        log5.setSourceIP("192.168.1.99");
+        log5.setDescription("failed to enter database");
+        log5.setDatetime(new Date());
+
+        Log log8 = new Log();
+        log5.setType(LogType.INFO);
+        log5.setLogTag(LogTag.DATABASE);
+        log5.setSourceIP("192.168.1.99");
+        log5.setDescription("failed to enter database");
+        log5.setDatetime(new Date());
+
 
         ArrayList<Log> logs = new ArrayList<>();
         logs.add(log1);
@@ -53,6 +74,10 @@ public class InsertLogs {
         logs.add(log3);
         logs.add(log4);
         logs.add(log5);
+        logs.add(log6);
+        logs.add(log7);
+        logs.add(log8);
+
 
         return logs;
     }

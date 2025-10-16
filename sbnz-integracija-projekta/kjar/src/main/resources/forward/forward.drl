@@ -127,16 +127,13 @@ end
 // Data Exfiltration
 rule "F10: Suspicious Database Access"
 when
-    $ip : String( this != null )
-    $count : Number( intValue > 5 ) from accumulate (
-        Log(
-            type == LogType.INFO,
-            logTag == LogTag.DATABASE,
-            sourceIP == $ip,
-            eval( !localIps.contains($ip) )
-        ),
-        count(1)
-    )
+
+    $l : Log( type == LogType.INFO, logTag == LogTag.DATABASE, $ip : sourceIP, description.contains("failed"))
+        $count : Number( intValue >= 3 ) from accumulate (
+            Log( type == LogType.INFO, sourceIP == $ip, description.contains("failed")),
+            count($l.getSourceIP())
+        )
+
 then
     insert(new Alert("Suspicious Database Access", Severity.MID, "Suspicious IP - Multiple Accesses: " + $ip));
 end
