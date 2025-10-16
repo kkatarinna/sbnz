@@ -2,10 +2,7 @@ package com.ftn.sbnz.service.sessionUtils;
 
 import com.ftn.sbnz.model.events.Alert;
 import com.ftn.sbnz.model.events.PacketEvent;
-import com.ftn.sbnz.model.models.Device;
-import com.ftn.sbnz.model.models.NetworkService;
-import com.ftn.sbnz.model.models.Recommendation;
-import com.ftn.sbnz.model.models.Vulnerability;
+import com.ftn.sbnz.model.models.*;
 import org.kie.api.runtime.KieSession;
 
 import java.util.List;
@@ -43,5 +40,9 @@ public class SessionUtils {
     }
     public static List<Vulnerability> getVulnerability(KieSession session) {
         return getFactsOfType(session, Vulnerability.class);
+    }
+
+    public static List<Log> getLogs(KieSession session) {
+        return getFactsOfType(session, Log.class);
     }
 }

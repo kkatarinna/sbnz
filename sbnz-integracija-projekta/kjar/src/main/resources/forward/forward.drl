@@ -1,10 +1,20 @@
 package forward;
+
+
+global java.util.Set localIps;
 import com.ftn.sbnz.model.models.NetworkService;
 import com.ftn.sbnz.model.models.Device;
 import com.ftn.sbnz.model.models.Vulnerability;
 import com.ftn.sbnz.model.models.Recommendation;
 import com.ftn.sbnz.model.models.Severity;
+import com.ftn.sbnz.model.events.PacketEvent;
 import com.ftn.sbnz.model.events.Alert;
+import com.ftn.sbnz.model.enums.Flag;
+import com.ftn.sbnz.model.models.Log;
+import com.ftn.sbnz.model.enums.LogTag;
+import com.ftn.sbnz.model.enums.LogType;
+
+import java.util.Date;
 
 //Telnet servis
 rule "F1: Telnet insecure"
@@ -54,4 +64,124 @@ when
 then
     insert( new Recommendation("Isolate device from external network" + $d, "Risk score >= 5"));
 
+end
+
+// Log fajlovi
+rule "F7: Detect multiple failed login attempts from same IP"
+when
+    $l : Log( type == LogType.INFO, $srcIP : sourceIP, description.contains("failed"))
+    $count : Number( intValue >= 3 ) from accumulate (
+        Log( type == LogType.INFO, sourceIP == $srcIP, description.contains("failed")),
+        count($l.getSourceIP())
+    )
+then
+    insert(new Alert("Suspicions IP", Severity.MID, "Suspicious IP - A lot of failed login attempts: " + $l.getSourceIP()));
+end
+
+rule "F8: Escalate alert for suspicious IP with malicious behavior"
+when
+    // Postoji novi log koji je ozbiljniji — pokušaj pristupa osetljivim delovima
+    $log : Log(
+        type == LogType.WARNING,
+        logTag == LogTag.ACCESS || logTag == LogTag.ACTION,
+        $ip : sourceIP,
+        description.toLowerCase matches "(.*private.*|.*restricted.*|.*sensitive.*|.*attack.*|.*exploit.*)"
+    )
+
+    // Postoji već alert za sumnjiv IP sa Severity.MID
+    $alert : Alert(
+        severity == Severity.MID,
+        code == "Suspicions IP",
+        description.contains($ip)
+    )
+then
+    Alert highAlert = new Alert(
+        "Malicious IP",
+        Severity.HIGH,
+        "IP address " + $ip + " is exhibiting malicious behavior: attempted access to sensitive parts of the system."
+    );
+    insert(highAlert);
+end
+
+rule "F9: Recommend blocking IP after multiple malicious alerts"
+when
+    // Grupisanje alert-a visokog nivoa sa istim IP-om u opisu
+    $ip : String( this != null )
+            $count : Number( intValue > 5 ) from accumulate (
+                Alert(
+                    severity == Severity.HIGH,
+                    description matches ".*IP address (\\d+\\.\\d+\\.\\d+\\.\\d+).*",
+                    $desc : description
+                ),
+                count(1)
+            )
+then
+    Recommendation rec = new Recommendation(
+        "Block IP " + $ip,
+        "Detected 3 or more malicious activities from IP " + $ip + ". Immediate blocking is recommended."
+    );
+    insert(rec);
+end
+
+// Data Exfiltration
+rule "F10: Suspicious Database Access"
+when
+    $ip : String( this != null )
+    $count : Number( intValue > 5 ) from accumulate (
+        Log(
+            type == LogType.INFO,
+            logTag == LogTag.DATABASE,
+            sourceIP == $ip,
+            eval( !localIps.contains($ip) )
+        ),
+        count(1)
+    )
+then
+    insert(new Alert("Suspicious Database Access", Severity.MID, "Suspicious IP - Multiple Accesses: " + $ip));
+end
+
+
+rule "F11: SQL Injection"
+when
+    // Postoji novi log koji je ozbiljniji — pokušaj pristupa osetljivim delovima
+    $log : Log(
+        type == LogType.WARNING,
+        logTag == LogTag.ACCESS || logTag == LogTag.ACTION,
+        $ip : sourceIP,
+        description.toLowerCase matches ".*(\\b(union select|select .* from|insert into|update .* set|delete from)\\b|\\bor\\s+1\\s*=\\s*1\\b|\\b'\\s+or\\s+'1'\\s*=\\s*'1\\b|\\b\"\\s+or\\s+\"1\"\\s*=\\s+\"1\"\\b|--|;--|/\\*|\\*/|\\bbenchmark\\s*\\(|\\bsleep\\s*\\(|\\binformation_schema\\b|\\bconcat\\s*\\(|\\bxp_cmdshell\\b).*"
+    )
+
+    // Postoji već alert za sumnjiv IP sa Severity.MID
+    $alert : Alert(
+        severity == Severity.MID,
+        code == "Suspicious Database Access",
+        description.toLowerCase contains $ip
+    )
+then
+    Alert highAlert = new Alert(
+        "Malicious Database Action",
+        Severity.HIGH,
+        "IP address " + $ip + " is exhibiting malicious behavior: attempted sql injection."
+    );
+    insert(highAlert);
+end
+
+rule "F12: Blocking IP after SQL Injection"
+when
+    // Grupisanje alert-a visokog nivoa sa istim IP-om u opisu
+    $ip : String( this != null )
+            $count : Number( intValue > 5 ) from accumulate (
+                Alert(
+                    severity == Severity.HIGH,
+                    description matches ".*attempted sql injectio.*",
+                    $desc : description
+                ),
+                count(1)
+            )
+then
+    Recommendation rec = new Recommendation(
+        "Block IP " + $ip,
+        "Detected  malicious activities from IP " + $ip + ". Immediate blocking is recommended."
+    );
+    insert(rec);
 end

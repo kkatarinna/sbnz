@@ -2,10 +2,8 @@ package com.ftn.sbnz.service;
 
 import com.ftn.sbnz.model.events.Alert;
 import com.ftn.sbnz.model.events.PacketEvent;
-import com.ftn.sbnz.model.models.Device;
-import com.ftn.sbnz.model.models.NetworkService;
-import com.ftn.sbnz.model.models.Recommendation;
-import com.ftn.sbnz.model.models.Vulnerability;
+import com.ftn.sbnz.model.models.*;
+import com.ftn.sbnz.model.models.Log;
 import com.ftn.sbnz.service.DTO.NetworkServiceDTO;
 import com.ftn.sbnz.service.DTO.PacketDTO;
 import com.ftn.sbnz.service.cep1Attacks.*;
@@ -15,6 +13,7 @@ import com.ftn.sbnz.service.Mapper.PacketMapper;
 import com.ftn.sbnz.service.cep2Attacks.DnsTunneling;
 import com.ftn.sbnz.service.cep2Attacks.IcmpTunneling;
 import com.ftn.sbnz.service.cep2Attacks.OutBoundPortAbuse;
+import com.ftn.sbnz.service.fwChain.InsertLogs;
 import com.ftn.sbnz.service.insert.InsertDevices;
 import com.ftn.sbnz.service.insert.InsertServices;
 import com.ftn.sbnz.service.sessionUtils.SessionUtils;
@@ -26,6 +25,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
 
 @Service
 public class SampleAppService {
@@ -529,6 +529,33 @@ public class SampleAppService {
             response.put("Recommendations", SessionUtils.getRecommendations(this.cepSession2));
         }
         return response;
+    }
+
+    public Map<String, Object> insertLogs() {
+        ArrayList<Log> logs = InsertLogs.generateLogs();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRules = new ArrayList<>();
+
+        this.fwSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRules.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        for(Log log : logs) {
+            this.fwSession.insert(log);
+
+        }
+        int count = this.fwSession.fireAllRules();
+
+        response.put("count: ", count);
+        response.put("firedRules", firedRules);
+        response.put("Packets", SessionUtils.getLogs(this.fwSession));
+        response.put("Alerts", SessionUtils.getAlerts(this.fwSession));
+        response.put("Recommendations", SessionUtils.getRecommendations(this.fwSession));
+        return response;
+
     }
 
 }

@@ -1,6 +1,9 @@
 package com.ftn.sbnz.service.insert;
 
+import com.ftn.sbnz.model.enums.LogTag;
+import com.ftn.sbnz.model.enums.LogType;
 import com.ftn.sbnz.model.models.Device;
+import com.ftn.sbnz.model.models.Log;
 import com.ftn.sbnz.model.models.NetworkService;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.DefaultAgendaEventListener;

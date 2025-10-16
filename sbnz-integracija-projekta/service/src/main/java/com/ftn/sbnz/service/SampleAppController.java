@@ -158,4 +158,13 @@ public class SampleAppController {
 
         return sampleService.outboundPortAbuse();
     }
+
+    @RequestMapping(value = "/insertLogs",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> insertLogs() {
+
+        return sampleService.insertLogs();
+    }
 }

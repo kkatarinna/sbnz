@@ -23,7 +23,15 @@ public class DroolsConfig {
 
     @Bean
     public KieSession fwKsession() {
-        return kieContainer.newKieSession("fwKsession");
+
+        KieSession kieSession = kieContainer.newKieSession("fwKsession");
+
+        Set<String> localIps = Set.of("192.168.1.100", "192.168.1.101","192.168.1.102","192.168.1.103");
+
+
+        kieSession.setGlobal("localIps", localIps);
+
+        return kieSession;
     }
 
     @Bean
