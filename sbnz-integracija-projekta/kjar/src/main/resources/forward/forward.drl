@@ -106,15 +106,16 @@ end
 rule "F9: Recommend blocking IP after multiple malicious alerts"
 when
     // Grupisanje alert-a visokog nivoa sa istim IP-om u opisu
-    $ip : String( this != null )
-            $count : Number( intValue > 5 ) from accumulate (
-                Alert(
-                    severity == Severity.HIGH,
-                    description matches ".*IP address (\\d+\\.\\d+\\.\\d+\\.\\d+).*",
-                    $desc : description
-                ),
-                count(1)
-            )
+    $l : Log( type == LogType.WARNING, $ip : sourceIP, description.toLowerCase matches "(.*private.*|.*restricted.*|.*sensitive.*|.*attack.*|.*exploit.*)")
+    $count : Number( intValue >= 3 ) from accumulate (
+        Alert(
+            severity == Severity.HIGH,
+            code == "Malicious IP",
+            description.contains($ip)),
+        count($l.getSourceIP())
+    )
+
+
 then
     Recommendation rec = new Recommendation(
         "Block IP " + $ip,
