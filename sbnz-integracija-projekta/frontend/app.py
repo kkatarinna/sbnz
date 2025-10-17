@@ -744,9 +744,60 @@ def run_devices():
         return render_template("index.html", result=result) 
     
 
-@app.route("/run-logs", methods=["POST"])
-def run_logs():
-    drools_url = "http://localhost:8080/insertLogs"
+@app.route("/run-logs-data-exfiltration", methods=["POST"])
+def run_logs_data_exfiltration():
+    drools_url = "http://localhost:8080/dataExfiltrationLogs"
+    try:
+        response = requests.post(drools_url, json={})
+        response.raise_for_status()
+        result = response.json()
+
+        # --- Priprema tabela ---
+        logs_table = []
+        for log in result.get("Logs", []):
+            logs_table.append([
+                log.get("datetime", ""),
+                log.get("type", ""),
+                log.get("sourceIP", ""),
+                log.get("description", ""),
+                log.get("logTag", ""),
+            
+            ])
+
+        alerts_table = []
+        for alert in result.get("Alerts", []):
+            alerts_table.append([
+                alert.get("id", ""),
+                alert.get("code", ""),
+                alert.get("severity", ""),
+                alert.get("description", ""),
+                alert.get("executionTime", "")
+            ])
+
+        recommendations_table = []
+        for rec in result.get("Recommendations", []):
+            recommendations_table.append([
+                rec.get("id", ""),
+                rec.get("action", ""),
+                rec.get("rationale", "")
+            ])
+
+        # Prosledi sve template-u
+        return render_template(
+            "index.html",
+            result=result,
+            logs_table=logs_table,
+            alerts_table=alerts_table,
+            recommendations_table=recommendations_table
+        )
+
+    except Exception as e:
+        result = {"error": str(e)}
+        return render_template("index.html", result=result) 
+
+@app.route("/run-logs-sql-injection", methods=["POST"])
+def run_logs_sql_injection():
+    drools_url = "http://localhost:8080/sqlInjection"
     try:
         response = requests.post(drools_url, json={})
         response.raise_for_status()

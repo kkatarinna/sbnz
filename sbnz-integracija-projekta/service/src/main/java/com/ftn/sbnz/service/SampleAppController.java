@@ -159,12 +159,21 @@ public class SampleAppController {
         return sampleService.outboundPortAbuse();
     }
 
-    @RequestMapping(value = "/insertLogs",
+    @RequestMapping(value = "/dataExfiltrationLogs",
             method = RequestMethod.POST,
             consumes = "application/json",
             produces = "application/json")
-    public Map<String, Object> insertLogs() {
+    public Map<String, Object> dataExfiltration() {
 
-        return sampleService.insertLogs();
+        return sampleService.insertLogsDataExfiltration();
+    }
+
+    @RequestMapping(value = "/sqlInjection",
+            method = RequestMethod.POST,
+            consumes = "application/json",
+            produces = "application/json")
+    public Map<String, Object> sqlInjection() {
+
+        return sampleService.insertLogsSqlInjection();
     }
 }

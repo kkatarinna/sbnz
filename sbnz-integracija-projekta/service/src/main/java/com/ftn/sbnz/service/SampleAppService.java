@@ -531,8 +531,35 @@ public class SampleAppService {
         return response;
     }
 
-    public Map<String, Object> insertLogs() {
+    public Map<String, Object> insertLogsDataExfiltration() {
         ArrayList<Log> logs = InsertLogs.generateLogs();
+        Map<String, Object> response = new HashMap<>();
+        List<String> firedRules = new ArrayList<>();
+
+        this.fwSession.addEventListener(new DefaultAgendaEventListener() {
+            @Override
+            public void afterMatchFired(AfterMatchFiredEvent event) {
+                firedRules.add(event.getMatch().getRule().getName());
+            }
+        });
+
+        for(Log log : logs) {
+            this.fwSession.insert(log);
+
+        }
+        int count = this.fwSession.fireAllRules();
+
+        response.put("count: ", count);
+        response.put("firedRules", firedRules);
+        response.put("Logs", SessionUtils.getLogs(this.fwSession));
+        response.put("Alerts", SessionUtils.getAlerts(this.fwSession));
+        response.put("Recommendations", SessionUtils.getRecommendations(this.fwSession));
+        return response;
+
+    }
+
+    public Map<String, Object> insertLogsSqlInjection() {
+        ArrayList<Log> logs = InsertLogs.generateLogsSql();
         Map<String, Object> response = new HashMap<>();
         List<String> firedRules = new ArrayList<>();
 

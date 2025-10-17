@@ -128,9 +128,9 @@ end
 rule "F10: Suspicious Database Access"
 when
 
-    $l : Log( type == LogType.INFO, logTag == LogTag.DATABASE, $ip : sourceIP, description.contains("failed"))
+    $l : Log( type == LogType.INFO, logTag == LogTag.DATABASE, $ip : sourceIP, description.contains("denied"))
         $count : Number( intValue >= 3 ) from accumulate (
-            Log( type == LogType.INFO, sourceIP == $ip, description.contains("failed")),
+            Log( type == LogType.INFO, sourceIP == $ip, description.contains("denied")),
             count($l.getSourceIP())
         )
 
