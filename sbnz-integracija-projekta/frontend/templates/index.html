@@ -16,6 +16,10 @@
     <form action="{{ url_for('run_devices') }}" method="post">
         <button type="submit">Skeniraj Uređaje</button>
     </form>
+
+    <form action="{{ url_for('run_logs') }}" method="post">
+        <button type="submit">Skeniraj Logove</button>
+    </form>
     <div class="button-grid">
         <form action="{{ url_for('run_outbound_port_abuse') }}" method="post">
             <button type="submit">Proveri Outbound Port Abuse</button>
@@ -71,6 +75,14 @@
             {{ macros.render_table(
                 ['ID', 'Source IP', 'Dest IP', 'Source Port', 'Dest Port', 'Protocol', 'Flags', 'Payload Size', 'DNS Query', 'Execution Time'],
                 packets_table
+            ) }}
+        {% endif %}
+
+        {% if logs_table %}
+            <h3>Logs</h3>
+            {{ macros.render_table(
+                ['Datetime', 'Type', 'Source IP', 'Description', 'Log Tag'],
+                logs_table
             ) }}
         {% endif %}
 

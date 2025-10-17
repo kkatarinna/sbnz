@@ -47,25 +47,32 @@ public class InsertLogs {
         log5.setDatetime(new Date());
 
         Log log6 = new Log();
-        log5.setType(LogType.INFO);
-        log5.setLogTag(LogTag.DATABASE);
-        log5.setSourceIP("192.168.1.99");
-        log5.setDescription("failed to enter database");
-        log5.setDatetime(new Date());
+        log6.setType(LogType.INFO);
+        log6.setLogTag(LogTag.DATABASE);
+        log6.setSourceIP("192.168.1.99");
+        log6.setDescription("failed to enter database");
+        log6.setDatetime(new Date());
 
         Log log7 = new Log();
-        log5.setType(LogType.INFO);
-        log5.setLogTag(LogTag.DATABASE);
-        log5.setSourceIP("192.168.1.99");
-        log5.setDescription("failed to enter database");
-        log5.setDatetime(new Date());
+        log7.setType(LogType.INFO);
+        log7.setLogTag(LogTag.DATABASE);
+        log7.setSourceIP("192.168.1.99");
+        log7.setDescription("failed to enter database");
+        log7.setDatetime(new Date());
 
         Log log8 = new Log();
-        log5.setType(LogType.INFO);
-        log5.setLogTag(LogTag.DATABASE);
-        log5.setSourceIP("192.168.1.99");
-        log5.setDescription("failed to enter database");
-        log5.setDatetime(new Date());
+        log8.setType(LogType.INFO);
+        log8.setLogTag(LogTag.DATABASE);
+        log8.setSourceIP("192.168.1.99");
+        log8.setDescription("failed to enter database");
+        log8.setDatetime(new Date());
+
+        Log log9 = new Log();
+        log9.setType(LogType.WARNING);
+        log9.setLogTag(LogTag.ACCESS);
+        log9.setSourceIP("192.168.1.99");
+        log9.setDescription("Access denied on query union select|select - SQL injection warning");
+        log9.setDatetime(new Date());
 
 
         ArrayList<Log> logs = new ArrayList<>();
@@ -77,6 +84,7 @@ public class InsertLogs {
         logs.add(log6);
         logs.add(log7);
         logs.add(log8);
+        logs.add(log9);
 
 
         return logs;

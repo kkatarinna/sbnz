@@ -166,20 +166,20 @@ end
 
 rule "F12: Blocking IP after SQL Injection"
 when
-    // Grupisanje alert-a visokog nivoa sa istim IP-om u opisu
-    $ip : String( this != null )
-            $count : Number( intValue > 5 ) from accumulate (
-                Alert(
-                    severity == Severity.HIGH,
-                    description matches ".*attempted sql injectio.*",
-                    $desc : description
-                ),
-                count(1)
-            )
+
+    $l : Log( type == LogType.WARNING, logTag == LogTag.ACCESS, $ip : sourceIP, description.toLowerCase matches ".*(\\b(union select|select .* from|insert into|update .* set|delete from)\\b|\\bor\\s+1\\s*=\\s*1\\b|\\b'\\s+or\\s+'1'\\s*=\\s*'1\\b|\\b\"\\s+or\\s+\"1\"\\s*=\\s+\"1\"\\b|--|;--|/\\*|\\*/|\\bbenchmark\\s*\\(|\\bsleep\\s*\\(|\\binformation_schema\\b|\\bconcat\\s*\\(|\\bxp_cmdshell\\b).*")
+        $count : Number( intValue >= 1 ) from accumulate (
+            Alert(
+                severity == Severity.HIGH,
+                code == "Malicious Database Action",
+                description.contains($ip)),
+            count($l.getSourceIP())
+        )
+
 then
     Recommendation rec = new Recommendation(
         "Block IP " + $ip,
-        "Detected  malicious activities from IP " + $ip + ". Immediate blocking is recommended."
+        "Detected  SQL Injection from IP " + $ip + ". Immediate blocking is recommended."
     );
     insert(rec);
 end

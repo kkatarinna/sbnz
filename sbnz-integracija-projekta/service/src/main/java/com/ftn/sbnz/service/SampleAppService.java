@@ -551,7 +551,7 @@ public class SampleAppService {
 
         response.put("count: ", count);
         response.put("firedRules", firedRules);
-        response.put("Packets", SessionUtils.getLogs(this.fwSession));
+        response.put("Logs", SessionUtils.getLogs(this.fwSession));
         response.put("Alerts", SessionUtils.getAlerts(this.fwSession));
         response.put("Recommendations", SessionUtils.getRecommendations(this.fwSession));
         return response;
